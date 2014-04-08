@@ -107,7 +107,7 @@ class GpTab(QTabWidget):
 	
 	def remove_tab(self, index, save=True):
 		if self.widget(index).isModified() and save:
-			msg = u"Le fichier {0} a était modifié\nVoulez vous enregistrer les changements?".format(self.widget(index).get_name())
+			msg = u"Le fichier {0} a été modifié\nVoulez vous enregistrer les changements?".format(self.widget(index).get_name())
 			reply = QMessageBox.question(self, u"Fichier modifié", msg, QMessageBox.Yes, QMessageBox.No)
 			if reply == QMessageBox.Yes:
 				self._save_file()
@@ -124,7 +124,7 @@ class GpTab(QTabWidget):
 	def check_modified(self):
 		for i in xrange(self.count()):
 			if self.widget(i).isModified():
-				msg = u"Le fichier {0} a était modifié\nVoulez vous enregistrer les changements?".format(self.widget(i).get_name())
+				msg = u"Le fichier {0} a été modifié\nVoulez vous enregistrer les changements?".format(self.widget(i).get_name())
 				reply = QMessageBox.question(self, u"Fichier modifié", msg, QMessageBox.Yes, QMessageBox.No)
 				if reply == QMessageBox.Yes:
 					self.widget(i).save_file()
