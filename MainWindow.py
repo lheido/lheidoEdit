@@ -53,11 +53,12 @@ class MainLayout(QWidget):
 		kwargs["parent"]._new_action(name="&Diviser", shortcut="ctrl+b", fun=self.add_splitter, menu="Affichage")
 		kwargs["parent"]._new_action(name="&Nouveau fichier", shortcut="ctrl+n", fun=self.__new_file, menu="Fichier")
 		kwargs["parent"]._new_action(name="&Ouvrir un fichier", shortcut="ctrl+o", fun=self.__open_file, menu="Fichier")
+		kwargs["parent"]._new_action(name="Ouvrir un fichier dans un nouveau groupe", shortcut="ctrl+shift+o", fun=self.__open_new_splitter, menu="Fichier")
 		kwargs["parent"]._new_action(name="&Toggle Focus", shortcut="alt+w", fun=self.toggle_focus, menu="Affichage")
 		kwargs["parent"]._new_action(name="&Next tab", shortcut="alt+<", fun=self._next_tab, menu="Affichage")
 		kwargs["parent"]._new_action(name="&Prev tab", shortcut="alt+shift+<", fun=self._prev_tab, menu="Affichage")
 		kwargs["parent"]._new_action(name=u"&Déplacer onglet vers le groupe suivante", shortcut="ctrl+shift+b", fun=self.move_tab_to_right, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Déplacer onglet vers le groupe précédent", shortcut="ctrl+alt+b", fun=self.move_tab_to_left, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"Déplacer onglet vers le groupe précédent", shortcut="ctrl+alt+b", fun=self.move_tab_to_left, menu="Affichage")
 		kwargs["parent"]._new_action(name="&Enregistrer", shortcut="ctrl+s", fun=self.__save_file, menu="Fichier")
 		kwargs["parent"]._new_action(name="Enregistrer &sous", shortcut="ctrl+shift+s", fun=self.__save_as, menu="Fichier")
 		kwargs["parent"]._new_action(name="&Fermer l'onglet courant", shortcut="ctrl+w", fun=self._remove_tab, menu="Fichier")
@@ -180,6 +181,9 @@ class MainLayout(QWidget):
 		else:
 			self._add_splitter()
 	
+	def __open_new_splitter(self):
+		self._add_splitter(False, None)
+	
 	@extend_manager()
 	def _next_tab(self):
 		self.splitter.widget(self._retrieve_focus()).switch_tab(True)
@@ -231,14 +235,20 @@ class MainWindow(QMainWindow):
 			self.move(settings.value("mainwindow/pos", QPoint(0,0)).toPoint())
 	
 	def __quit(self):
-		self.mainLayout._quit()
+		reply = QMessageBox.Yes
 		settings = QSettings("lheido", "lheidoEdit")
-		if settings.value("general/save_geo", QVariant(True)).toBool():
-			settings.setValue("mainwindow/size", self.size())
-			settings.setValue("mainwindow/maximized", self.isMaximized())
-			settings.setValue("mainwindow/pos", self.pos())
-			settings.sync()
-		self.close()
+		if settings.value("general/valide_fermeture", QVariant(False)).toBool():
+			msg = u"Voulez vous vraiment quitter l'application?"
+			reply = QMessageBox.question(self, u"Confirmation", msg, QMessageBox.Yes, QMessageBox.No)
+			print reply
+		if reply == QMessageBox.Yes:
+			self.mainLayout._quit()
+			if settings.value("general/save_geo", QVariant(True)).toBool():
+				settings.setValue("mainwindow/size", self.size())
+				settings.setValue("mainwindow/maximized", self.isMaximized())
+				settings.setValue("mainwindow/pos", self.pos())
+				settings.sync()
+			self.close()
 	
 	def highlight_manager(self):
 		dialog = HighlightManagerDialog(self)

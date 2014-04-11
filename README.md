@@ -10,10 +10,12 @@ Basic features :
  - syntax highlighting.
  - mutliple group tabs.
  - loading the previous session when starting the application.
- - keyboard shortcuts for all menu actions.
+ - keyboard shortcuts for all actions.
  - code folding.
 
 --------------------------------------------------------------------------------
-Other features :
+Other features (coming soon) :
 
- - syntax highlighting manager. (coming soon)
+ - syntax highlighting manager.
+ - execute command in a terminal.
+ - snippets.

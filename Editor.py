@@ -6,7 +6,7 @@ from os.path import basename, getmtime, abspath, exists
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciScintilla, QsciAPIs
+from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciCommand
 from extend import extend_manager
 
 @extend_manager(mth=False)
@@ -37,7 +37,16 @@ class Editor(QsciScintilla):
 			self.new_file()
 		self.modificationChanged[bool].connect(self.modifChanged)
 		#~ self.menu = self.createStandardContextMenu()
-		#~ action = self.menu.addAction(tr("Delete line"), self, SLOT(delete_line()))
+		#~ action = self.menu.addAction(u"Delete line", self, SLOT(self.delete_line()))
+		#~ stdCmd = self.standardCommands()
+		#~ cmd = stdCmd.find(QsciCommand.LineDelete)
+		#~ if cmd and cmd.key():
+			#~ action.setShortcut(QKeySequence(cmd.key()))
+		#~ action.setEnabled(False)
+	#~ 
+	#~ def delete_line(self):
+		#~ self.SendScintilla(QsciScintilla.SCI_LINEDELETE, 0, 0)
+		#~ pass
 	
 	def modifChanged(self, m):
 		self.parent.modifChanged(m)
