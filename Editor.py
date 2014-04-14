@@ -66,6 +66,20 @@ class Editor(QsciScintilla):
 			if r and "Custom" not in name:
 				default_lexers[r.group(0)] = lexer()
 		
+		path = abspath("dev-theme/dev_lexers")
+		if exists(path):
+			sys.path.append(path)
+			regex2 = re.compile(r"(^.+)\.py$")
+			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
+			for elt in lexers_list:
+				tmp = __import__(elt)
+				cl = tmp.__dict__[elt.capitalize()]
+				name = regex.search(cl.__bases__[0].__name__)
+				name = name.group(0)
+				if name not in default_lexers:
+					name = cl.__name__
+					self.language_extension[name] = [name.lower()]
+				default_lexers[name] = cl()
 		path = abspath("custom_lexers")
 		if exists(path):
 			sys.path.append(path)
@@ -81,6 +95,21 @@ class Editor(QsciScintilla):
 					self.language_extension[name] = [name.lower()]
 				default_lexers[name] = cl()
 		return default_lexers
+	
+	def __check_lexer(self, path, default_lexers):
+		if exists(path):
+			sys.path.append(path)
+			regex2 = re.compile(r"(^.+)\.py$")
+			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
+			for elt in lexers_list:
+				tmp = __import__(elt)
+				cl = tmp.__dict__[elt.capitalize()]
+				name = regex.search(cl.__bases__[0].__name__)
+				name = name.group(0)
+				if name not in default_lexers:
+					name = cl.__name__
+					self.language_extension[name] = [name.lower()]
+				default_lexers[name] = cl()
 	
 	def _lang(self):
 		extension = re.sub(r'.+\.(.+)$', r'\1', self.basename)

@@ -1,0 +1,238 @@
+
+QMenuBar, QMainWindow, QFrame, QMenu, QStatusBar, QTabBar::tab, QCheckBox, QDialog {
+	background-color: rgb(42,42,42);
+	padding: 0px;
+	margin: 0px;
+	border: none;
+}
+
+#indentTitle, #demarrageTitle, #fermetureTitle {
+	padding-left: 10px;
+	margin-top: 10px;
+	border-bottom: 1px solid rgb(84,84,84)
+}
+
+QLabel, QCheckBox {
+	color: white;
+}
+
+QMenuBar::item {
+	padding: 2px 5px;
+	padding-top: 9px;
+	margin: 0px;
+}
+
+QMenuBar::item, QMenu::item {
+	background-color: rgb(42,42,42);
+	color: rgb(255,255,255);
+}
+
+QMenuBar::item:selected, QMenu::item:selected {
+	background-color: rgb(84,84,84);
+	color: rgb(255,255,255);
+}
+
+QMenuBar QWidget {
+	margin: 0px;
+	padding: 0px;
+}
+
+/*
+QMenuBar {
+	border-bottom: 1px solid rgb(84,84,84);
+}
+*/
+
+#alternate_close {
+	image: url(imgs/alternate_close.png);
+}
+
+#alternate_close:hover {
+	image: url(imgs/alternate_close_hover.png);
+}
+
+#alternate_mini {
+	image: url(imgs/alternate_minimize.png);
+}
+
+#alternate_mini:hover {
+	image: url(imgs/alternate_minimize_hover.png);
+}
+
+#alternate_maxi {
+	image: url(imgs/alternate_maximize.png);
+}
+
+#alternate_maxi:hover {
+	image: url(imgs/alternate_maximize_hover.png);
+}
+#alternate_close, #alternate_maxi, #alternate_mini, #settings {
+	background-color: rgb(84,84,84);
+	color: white;
+	border: none;
+	padding: 0px 1px;
+	width: 14px;
+	height: 17px;
+	margin: 0px 2px;
+}
+
+#settings {
+	image: url(imgs/settings.png);
+	width: 15px;
+	height: 14px;
+	padding: 2px 3px;
+	margin-top: 8px;
+	margin-right: 10px;
+}
+
+#settings:hover {
+	image: url(imgs/settings_hover.png);
+}
+
+QMenuBar QPushButton:selected {
+	border: none;
+}
+
+QScrollBar:horizontal, QScrollBar:vertical {
+	border: none;
+	background: rgb(42,42,42);
+	height: 12px;
+	margin: 0px 20px 0px 20px;
+}
+
+QScrollBar:vertical {
+	height: auto;
+	width: 12px;
+	margin: 20px 0px 20px 0px;
+}
+
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+	background: rgb(84,84,84);
+	min-width: 20px;
+}
+
+QScrollBar::handle:vertical{
+	width: 12px;
+	min-width: 12px;
+	min-height: 20px;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::add-line:vertical {
+	border: none;
+	background: rgb(42,42,42);
+	width: 20px;
+	subcontrol-position: right;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:vertical {
+	width: 12px;
+	height: 20px;
+	subcontrol-position: bottom;
+}
+
+QScrollBar::sub-line:horizontal, QScrollBar::sub-line:vertical {
+	border: none;
+	background: rgb(42,42,42);
+	width: 20px;
+	subcontrol-position: left;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+	width: 12px;
+	height: 20px;
+	subcontrol-position: top;
+}
+
+QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal, QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical {
+	border: none;
+	width: 3px;
+	height: 3px;
+	background: grey;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal, QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+	background: none;
+}
+
+QStatusBar {
+	color: white;
+}
+
+QTabWidget::pane {
+	border: 1px solid rgb(84,84,84);
+}
+
+QTabWidget::tab-bar {
+	left: 0px;
+}
+
+QTabBar::tab {
+	min-width: 8ex;
+	padding: 5px 20px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:selected:hover {
+	background-color: rgb(84,84,84);
+}
+
+QTabBar::tab:hover {
+	background-color: rgb(63,63,63);
+}
+
+QTabBar::close-button {
+	image: url(imgs/close.png);
+	subcontrol-position: right;
+}
+
+QTabBar::close-button:hover {
+	image: url(imgs/close_hover.png);
+	subcontrol-position: right;
+}
+
+QTabBar::tab:!selected {
+	margin-top: 0px;
+}
+
+#gpTabClose {
+	image: url(imgs/close.png);
+	background-color: rgb(42,42,42);
+	border: 1px solid black;
+	padding: 7px 0px;
+}
+
+#gpTabClose:hover {
+	image: url(imgs/close_hover.png);
+}
+
+QsciScintilla {
+	color: white;
+}
+
+QsciScintilla QAbstractItemView {
+	background-color: rgb(23,23,23);
+	color: white;
+}
+
+QsciScintilla QAbstractItemView::item:selected  {
+	background-color: rgb(84,84,84);
+	color: white;
+}
+
+QComboBox {
+	border: 1px solid rgb(84,84,84);
+	padding: 0px 18px 0px 12px;
+	background-color: rgb(23,23,23);
+	color: white;
+}
+
+QComboBox::drop-down {
+	subcontrol-origin: padding;
+	subcontrol-position: top right;
+	width: 0px;
+}
+
+QComboBox QAbstractItemView {
+	border: 1px solid rgb(84,84,84);
+}

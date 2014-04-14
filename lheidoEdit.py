@@ -12,7 +12,7 @@ class LheidoEdit(QApplication):
 	def __init__ (self, argv):
 		QApplication.__init__(self, argv)
 		self.__mainWin = MainWindow()
-		with open("dev_theme.css") as t:
+		with open("dev-theme/dev_theme.css") as t:
 			dev_theme = t.read()
 		self.setStyleSheet(dev_theme)
 	
