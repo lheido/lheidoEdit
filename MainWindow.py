@@ -204,6 +204,65 @@ class MainLayout(QWidget):
 		for i in range(self.splitter.count()):
 			self.splitter.widget(i)._clear_focus()
 
+class MenuBar(QMenuBar):
+	
+	def __init__ (self, parent=None):
+		super(MenuBar, self).__init__(parent)
+		self.parent = parent
+		self.offset = None
+		self.menus = {
+			"Fichier": self.addMenu("&Fichier"),
+			"Affichage": self.addMenu("&Affichage"),
+			"Outils": self.addMenu("&Outils")
+		}
+		widget = QWidget(self)
+		layout = QHBoxLayout(self)
+		layout.setSpacing(0)
+		self.close_button = QPushButton("")
+		self.close_button.setObjectName("alternate_close")
+		self.close_button.setFocusPolicy(Qt.NoFocus)
+		self.close_button.setToolTip(u"Fermer")
+		self.mini_button = QPushButton("")
+		self.mini_button.setObjectName("alternate_mini")
+		self.mini_button.setToolTip(u"Minimiser")
+		self.mini_button.setFocusPolicy(Qt.NoFocus)
+		self.maxi_button = QPushButton("")
+		self.maxi_button.setObjectName("alternate_maxi")
+		self.maxi_button.setToolTip(u"Maximiser")
+		self.maxi_button.setCheckable(True)
+		self.maxi_button.setFocusPolicy(Qt.NoFocus)
+		layout.addWidget(self.close_button)
+		layout.addWidget(self.mini_button)
+		layout.addWidget(self.maxi_button)
+		layout.addStretch(1)
+		widget.setLayout(layout)
+		self.pref_button = QPushButton(u"")
+		self.pref_button.setObjectName("settings")
+		self.pref_button.setIcon(QIcon(".imgs/settings.png"))
+		self.pref_button.setIconSize(QSize(15,14))
+		self.pref_button.setToolTip(u"Préférences")
+		self.pref_button.setFocusPolicy(Qt.NoFocus)
+		self.setCornerWidget(widget, Qt.TopLeftCorner)
+		self.setCornerWidget(self.pref_button, Qt.TopRightCorner)
+	
+	def mousePressEvent(self, event):
+		if event.button() == Qt.RightButton:
+			self.offset = event.pos()
+		super(MenuBar, self).mousePressEvent(event)
+	
+	def mouseReleaseEvent(self, event):
+		self.offset = None
+		super(MenuBar, self).mouseReleaseEvent(event)
+	
+	def mouseMoveEvent(self, event):
+		x=event.globalX()
+		y=event.globalY()
+		if self.offset:
+			x_w = self.offset.x()
+			y_w = self.offset.y()
+			self.parent.move(x-x_w, y-y_w)
+		super(MenuBar, self).mouseMoveEvent(event)
+
 @extend_manager(mth=False)	
 class MainWindow(QMainWindow):
 	""" Main window for lheidoEdit """
@@ -213,12 +272,10 @@ class MainWindow(QMainWindow):
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.statusbar = self.statusBar()
 		self.setWindowTitle("LheidoEdit")
-		self.menubar = self.menuBar()
-		self.menus = {
-			"Fichier": self.menubar.addMenu("&Fichier"),
-			"Affichage": self.menubar.addMenu("&Affichage"),
-			"Outils": self.menubar.addMenu("&Outils")
-		}
+		#~ self.menubar = self.menuBar()
+		self.menubar = MenuBar(self)
+		self.setMenuBar(self.menubar)
+		
 		# add action exit and toggle menubar to mainWindow
 		self.mainLayout = MainLayout(self)
 		self.setCentralWidget(self.mainLayout)
@@ -226,7 +283,7 @@ class MainWindow(QMainWindow):
 		self._new_action(name="&Afficher/cacher la bar de menu", shortcut="ctrl+F1", fun=self._toggle_menu_bar, menu="Affichage")
 		self._new_action(name="&HighlightManager", shortcut="ctrl+F2", fun=self.highlight_manager, menu="Outils")
 		self._new_action(name="&Préférences", shortcut="ctrl+alt+p", fun=self.settings)
-		self.__window_button()
+		self.__menubar_event()
 		settings = QSettings("lheido", "lheidoEdit")
 		if settings.value("mainwindow/maximized", QVariant(False)).toBool():
 			self.showMaximized()
@@ -240,7 +297,6 @@ class MainWindow(QMainWindow):
 		if settings.value("general/valide_fermeture", QVariant(False)).toBool():
 			msg = u"Voulez vous vraiment quitter l'application?"
 			reply = QMessageBox.question(self, u"Confirmation", msg, QMessageBox.Yes, QMessageBox.No)
-			print reply
 		if reply == QMessageBox.Yes:
 			self.mainLayout._quit()
 			if settings.value("general/save_geo", QVariant(True)).toBool():
@@ -266,69 +322,27 @@ class MainWindow(QMainWindow):
 		action.triggered.connect(kwargs["fun"])
 		self.addAction(action)
 		if "menu" in kwargs:
-			self.menus[kwargs["menu"]].addAction(action)
+			self.menubar.menus[kwargs["menu"]].addAction(action)
 	
 	@extend_manager()
 	def _new_menu(self, **kwargs):
 		""" _new_menu(name=) """
 		if kwargs["name"] not in self.menus:
-			self.menus[kwargs["name"]] = self.menubar.addMenu("&{0}".format(kwargs["name"]))
+			self.menubar.menus[kwargs["name"]] = self.menubar.addMenu("&{0}".format(kwargs["name"]))
 	
-	def __window_button(self):
-		widget = QWidget(self)
-		layout = QHBoxLayout(self)
-		layout.setSpacing(0)
-		close = QPushButton("")
-		close.setObjectName("alternate_close")
-		close.clicked.connect(self.__quit)
-		close.setFocusPolicy(Qt.NoFocus)
-		close.setToolTip(u"Fermer")
-		mini = QPushButton("")
-		mini.setObjectName("alternate_mini")
-		mini.setToolTip(u"Minimiser")
-		mini.clicked.connect(self.showMinimized)
-		mini.setFocusPolicy(Qt.NoFocus)
-		maxi = QPushButton("")
-		maxi.setObjectName("alternate_maxi")
-		maxi.setToolTip(u"Maximiser")
-		maxi.setCheckable(True)
-		maxi.clicked[bool].connect(self.toggleMaximized)
-		maxi.setFocusPolicy(Qt.NoFocus)
-		layout.addWidget(close)
-		layout.addWidget(mini)
-		layout.addWidget(maxi)
-		layout.addStretch(1)
-		widget.setLayout(layout)
-		pref = QPushButton(u"")
-		pref.setObjectName("settings")
-		pref.setIcon(QIcon(".imgs/settings.png"))
-		pref.setIconSize(QSize(15,14))
-		pref.setToolTip(u"Préférences")
-		pref.clicked.connect(self.settings)
-		pref.setFocusPolicy(Qt.NoFocus)
-		self.menubar.setCornerWidget(widget, Qt.TopLeftCorner)
-		self.menubar.setCornerWidget(pref, Qt.TopRightCorner)
-		#~ self.menubar.mousePressEvent = self.__mousePressEvent
-		#~ self.menubar.mouseMoveEvent = self.__mouseMoveEvent
+	def __menubar_event(self):
+		self.menubar.close_button.clicked.connect(self.__quit)
+		self.menubar.mini_button.clicked.connect(self.showMinimized)
+		self.menubar.maxi_button.clicked[bool].connect(self.toggleMaximized)
+		self.menubar.pref_button.clicked.connect(self.settings)
 	
 	def settings(self):
 		settings = SettingsDialog(self)
 		if settings.exec_():
 			print settings.get_settings()
 		else:
-			settings.get_error()
+			print settings.get_error()
 	
 	def toggleMaximized(self, pressed):
 		if pressed: self.showMaximized()
 		else: self.showNormal()
-	
-	#~ def mousePressEvent(self, event):
-	    #~ self.offset = event.pos()
-	#~ 
-	#~ def mouseMoveEvent(self, event):
-	    #~ x=event.globalX()
-	    #~ y=event.globalY()
-	    #~ x_w = self.offset.x()
-	    #~ y_w = self.offset.y()
-	    #~ self.move(x-x_w, y-y_w)
-

@@ -73,6 +73,7 @@ class Editor(QsciScintilla):
 			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
 			for elt in lexers_list:
 				tmp = __import__(elt)
+				tmp = reload(tmp)
 				cl = tmp.__dict__[elt.capitalize()]
 				name = regex.search(cl.__bases__[0].__name__)
 				name = name.group(0)
@@ -87,6 +88,7 @@ class Editor(QsciScintilla):
 			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
 			for elt in lexers_list:
 				tmp = __import__(elt)
+				tmp = reload(tmp)
 				cl = tmp.__dict__[elt.capitalize()]
 				name = regex.search(cl.__bases__[0].__name__)
 				name = name.group(0)
@@ -95,21 +97,6 @@ class Editor(QsciScintilla):
 					self.language_extension[name] = [name.lower()]
 				default_lexers[name] = cl()
 		return default_lexers
-	
-	def __check_lexer(self, path, default_lexers):
-		if exists(path):
-			sys.path.append(path)
-			regex2 = re.compile(r"(^.+)\.py$")
-			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
-			for elt in lexers_list:
-				tmp = __import__(elt)
-				cl = tmp.__dict__[elt.capitalize()]
-				name = regex.search(cl.__bases__[0].__name__)
-				name = name.group(0)
-				if name not in default_lexers:
-					name = cl.__name__
-					self.language_extension[name] = [name.lower()]
-				default_lexers[name] = cl()
 	
 	def _lang(self):
 		extension = re.sub(r'.+\.(.+)$', r'\1', self.basename)
@@ -180,7 +167,7 @@ class Editor(QsciScintilla):
 			self.__auto_completion(lexer)
 			self.setLexer(lexer)
 		except Exception, ex:
-			print ex
+			print "erreur lexer update", ex
 			self.setPaper(QColor(33,33,33))
 			self.setColor(QColor("#FFFFFF"))
 		# Margin 1 is used for line numbers
@@ -206,6 +193,7 @@ class Editor(QsciScintilla):
 		if settings.value("editeur/pliage", QVariant(True)).toBool():
 			self.setFolding(QsciScintilla.BoxedTreeFoldStyle)
 			self.setFoldMarginColors(QColor("#242424"), QColor("#242424"))
+		self.update()
 	
 	def __auto_completion(self, lexer):
 		api = QsciAPIs(lexer)

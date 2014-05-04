@@ -63,6 +63,7 @@ Base obj defintion decorator
 			user_extensions = []
 			for ext in extensions_list:
 				tmp = __import__(ext)
+				tmp = reload(tmp)
 				for key, value in tmp.__dict__.items():
 					if isinstance(value, Extend):
 						user_extensions.append(value)

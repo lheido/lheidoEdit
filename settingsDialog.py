@@ -80,6 +80,13 @@ class SettingsDialog(QDialog):
 		i = self.tab.addTab(QWidget(), u"Fichiers")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
 		# Interface
+		#~ interface = QWidget(self)
+		#~ interface_box = QVBoxLayout(self)
+		#~ font_global_label = QPushButton(u"Police Pour l'interface", self)
+		#~ if settings.value("interface/global_font", QFont()).to
+		#~ font_global_label.clicked.connect(self.font_global_dialog)
+		#~ font_editor_label = QPushButton(u"Police Pour l'éditeur", self)
+		#~ font_editor_label.clicked.connect(self.font_editor_dialog)
 		i = self.tab.addTab(QWidget(), u"Interface")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
 		# Editeur
@@ -128,6 +135,8 @@ class SettingsDialog(QDialog):
 		settings.setValue("general/save_geo", self.save_geo.isChecked())
 		settings.setValue("general/valide_fermeture", self.valide_fermeture.isChecked())
 		settings.setValue("general/prec_session", self.prec_session.isChecked())
+		settings.setValue("interface/global_font", self.global_font)
+		settings.setValue("interface/editor_font", self.editor_font)
 		settings.sync()
 		QDialog.accept(self)
 	
@@ -136,6 +145,17 @@ class SettingsDialog(QDialog):
 	
 	def annuler(self):
 		self.close()
+	
+	def font_global_dialog(self):
+		font, ok = QFontDialog.getFont()
+		if ok:
+			self.setFont(font)
+			self.global_font = font
+	
+	def font_editor_dialog(self):
+		font, ok = QFontDialog.getFont()
+		if ok:
+			self.editor_font = font
 	
 	def get_settings(self):
 		return "settings saved"
@@ -147,7 +167,7 @@ class SettingsDialog(QDialog):
 if __name__ == '__main__':
 	import sys
 	app = QApplication(sys.argv)
-	with open("dev_theme.css") as t:
+	with open("dev-theme/dev_theme.css") as t:
 		dev_theme = t.read()
 	app.setStyleSheet(dev_theme)
 	dialog = SettingsDialog()

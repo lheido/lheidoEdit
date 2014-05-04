@@ -89,10 +89,10 @@ class GpTab(QTabWidget):
 		self.setCurrentIndex(new_id)
 	
 	def switch_focus(self, new_index):
-		#~ print "currentChanged called"
 		if new_index != -1:
 			self.setFocusProxy(self.widget(new_index))
 			self.setFocus(True)
+		self.widget(new_index).update_config()
 	
 	def get_tab(self):
 		index = self.currentIndex()
