@@ -12,7 +12,7 @@ Basic features :
  - loading the previous session when starting the application.
  - keyboard shortcuts for all actions.
  - code folding.
- - syntax highlighting manager. (/!\\ save keywords before)
+ - syntax highlighting manager. (/!\\ save keywords before use it)
 
 --------------------------------------------------------------------------------
 Other features (coming soon) :
