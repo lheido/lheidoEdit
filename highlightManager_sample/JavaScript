@@ -1,0 +1,33 @@
+/** This is a sample code */
+var arr = new Array();
+res = a * 2.5 - 43 % 9;
+res /= 7;
+/* Control structure */
+if( myVariable == 'm' ) {
+  myVariable = 1;
+} else if( myVariable == 5 ) {
+  myVariable = 3;
+} else {
+  myVariable = 4;
+}
+// Loop
+for( var x = 1; x < 5; x++ ) {
+  var y = 1;
+  while( y < 7 ) {
+    y++;
+    if( y == 5 ) { break; }
+    document.write(y);
+  }
+}
+// Function
+var a = 1, b = 2.5, c = 3.45e2;
+function sample() {
+  var a, d = 'something', e = "something else";
+  function anothersample() {
+    var e, f = 0x4f2a7;
+  }
+  anothersample();
+}
+sample();
+// Regular expression
+urlMatch = /window\.open\s*\(\s*["']([^"']*)["']/;

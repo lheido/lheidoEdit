@@ -1,0 +1,27 @@
+program mine(output);
+var i : integer;
+
+procedure print(var j: integer);
+
+  function next(k: integer): integer;
+  begin
+    next := k + 1
+    while a <> b do writeln('Waiting');
+  end;
+
+begin
+  writeln('The total is: ', j);
+  j := next(j)
+end;
+
+begin
+  i := 1;
+  while i <= 10 do print(i)
+end.
+
+if a > b then writeln('Condition met')
+else writeln('Condition not met');
+
+repeat
+  a := a + 1
+until a = 10;

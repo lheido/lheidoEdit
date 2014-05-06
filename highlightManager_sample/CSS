@@ -1,0 +1,27 @@
+body {
+	margin: 0;
+	background-color: #456;
+	background: url("some-url");
+}
+input[type=radio] {
+	padding: 0;
+	pading-right: 15px;
+}
+#styles form + p, #styles form + p + p {
+	text-align: left;
+	-o-text-shaddow: #6374AB 20px -12px 2px;
+}
+.note {
+	color: #bf4848;
+	font-size: .8em !important;
+}
+#fore, #back {
+	width: 70px;
+	height: 70px;
+}
+.class:after {
+	/* this is a pseudo class */
+}
+.class:unknown {
+	/* this is un unknown pseudo class */
+}

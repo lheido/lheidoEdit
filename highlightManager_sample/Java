@@ -1,0 +1,27 @@
+/**
+ * Outputs "Hello, World!"
+ */
+// Hello.java (Java SE 5)
+import java.awt.BorderLayout;
+import javax.swing.*;
+public class Hello extends JFrame {
+  public Hello() {
+    super("hello");
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    setLayout(new BorderLayout());
+    add(new JLabel('Hello, world!'));
+    pack();
+  }
+  public static void main(String[] args) {
+    new Hello().setVisible(true);
+  }
+}
+
+/* Hello.java Applet */
+import javax.swing.JApplet;
+import java.awt.Graphics;
+public class Hello extends JApplet {
+  public void paintComponent(Graphics g) {
+    g.drawString("Hello, world!", 65, 95);
+  }
+}

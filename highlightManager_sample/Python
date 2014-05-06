@@ -1,0 +1,32 @@
+def qsort(L):
+    if L == []:
+        return []
+    pivot = L[0]
+    return (qsort([x for x in L[1:] if x < pivot]) +
+            [pivot] +
+            qsort([x for x in L[1:] if x >= pivot]))
+
+def foo(x):
+    if x == 0:
+        bar()
+    else:
+        foo(x - 1)
+
+def getline():
+    """Get one line from stdin
+       and return it."""
+    return sys.stdin.readline()
+
+@invincible
+@favourite_colour('Blue')
+def black_knight():
+    pass
+
+def black_knight():
+    pass
+black_knight = invincible(f_colour("Blue")(black_knight))
+
+for i in generate_primes():  # iterate over ALL primes
+    if i > 100:
+        break
+    print i

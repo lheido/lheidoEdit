@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns="http://www.w3.org/1999/xhtml"
+xml:lang="en" lang="en">
+ <head>
+ <meta http-equiv="Content-Type"
+ content="text/html; charset=utf-8" />
+ <title>XHTML 1.0 Example</title>
+ <style rel="stylesheet" type="text/css">
+ <![CDATA[
+ body {
+ 	color: red;
+ }
+ ]]>
+ </style>
+ <script language="JavaScript"> 
+   function loadpdf() {
+   document.getElementById("pdf-object").src=
+"http://www.w3.org/TR/xhtml1/xhtml1.pdf";
+ }
+ </script>
+ </head>
+ <body onload="loadpdf()">
+ <p>This is an example of an
+ <abbr title="Extensible HyperText Markup Language">
+&quot;XHTML&quot;</abbr> 1.0 Strict document.<br />
+ <img id="validation-icon"
+   src='http://www.w3.org/Icons/valid-xhtml10'
+   alt='Valid XHTML 1.0 Strict' /><br />
+ <video></video>
+ <object id="pdf-object"
+   name="pdf-object"
+   type="application/pdf"
+   data="http://www.w3.org/TR/xhtml1/xhtml1.pdf"
+   width="100%"
+   height="500">
+ </object>
+ </p>
+ <script language="JavaScript"> 
+    /* just a function */
+    function init(){
+      var el = document.getElementById('dhtmlspan');
+        el.innerHTML = "Executed when done loading page.";
+    }
+    // wtite
+    document.write("Executed during load.");
+ </script>
+ </body>
+</html>
+
+<!-- Below this comment is PHP code -->
+
+<?php
+function hello(){
+    return 'Hello';
+}
+function world(){
+    return "World!\n";
+}
+/* some variables */
+$fn1 = 'hello';
+$fn2 = 'world';
+echo $fn1() . ' ' . $fn2();
+// example class
+class foo extends bar{
+	function __construct() {
+		$doo = "wah dee $something dee ";
+	}
+	public static function mystaticfunc() {
+		$dee = "dee dee dum";
+	}
+}
+?>

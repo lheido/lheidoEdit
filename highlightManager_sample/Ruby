@@ -1,0 +1,33 @@
+a = [1, 'hi', 3.14, 1, 2, [4, 5]]
+p a[2]           # 3.14
+p a.[](2)        # 3.14
+hash = { :water => 'wet', :fire => 'hot' }
+hash.each_pair do |key, value|
+  puts "#{key} is #{value}"
+end
+{ puts "Hello, World!" } # Note the { braces }
+do puts "Hello, World!" end
+def remember(&a_block)
+  @block = a_block
+end
+remember {|name| puts "Hello, #{name}!"}
+@block.call("Jon")
+File.open('file.txt', 'w') do |file|
+  file.puts 'Wrote some text.'
+end
+class Person
+  def initialize(name, age)
+    @name, @age = name, age
+  end
+  def <=>(person) # Comparison operator for sorting
+    @age <=> person.age
+  end
+  def to_s
+    "#@name (#@age)"
+  end
+end
+group = [
+  Person.new("Chris", 16),
+  Person.new("Ash", 23)
+]
+puts group.sort.reverse

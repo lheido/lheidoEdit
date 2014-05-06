@@ -1,0 +1,31 @@
+#include <iostream.h>
+struct Paper {
+public:
+    void GetDimensions();
+private:
+    double Perimeter() const;
+    double Height;
+    double Width;
+};
+void Paper::GetDimensions() {
+    cout << "Height: ";
+    cin >> Height;
+    cout << "Width: ";
+    cin >> Width;
+}
+double Paper::Perimeter() const {
+    return 2 + (Height * Width);
+}
+void main() {
+    int Samples;
+    Paper Label[100];
+    cout << "How many sample labels do you want? ";
+    cin >> Samples;
+    for(int i = 0; i < Samples; ++i)
+        Label[i].GetDimensions();
+    cout << "\n\nCharacteristics of your labels\n";
+    for(int j = 0; j < Samples; ++j) {
+        cout << "Label No. " << j;
+        Label[j].Properties();
+    }
+}

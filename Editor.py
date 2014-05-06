@@ -8,6 +8,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciCommand
 from extend import extend_manager
+import load_lexer
 
 @extend_manager(mth=False)
 class Editor(QsciScintilla):
@@ -30,7 +31,10 @@ class Editor(QsciScintilla):
 			"Diff": ["diff","patch","rej"], "TeX": ["tex","sty","idx","ltx","latex"], 
 			"CMake": ["cmake","ctest"], "Matlab": ["m"]
 		}
-		self.lexers = self._lexer() 
+		
+		self.lexers, new_langage = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])
+		for elt in new_langage:
+			self.language_extension[elt] = new_langage[elt] 
 		if self.file_path != "":
 			self.open_file()
 		else:
@@ -57,46 +61,46 @@ class Editor(QsciScintilla):
 	def get_path (self):
 		return self.file_path
 	
-	def _lexer(self):
-		default_lexer_module = __import__("PyQt4.Qsci")
-		regex = re.compile(r"(?<=QsciLexer)(.+)")
-		default_lexers = {}
-		for name, lexer in default_lexer_module.Qsci.__dict__.items():
-			r = regex.search(name)
-			if r and "Custom" not in name:
-				default_lexers[r.group(0)] = lexer()
-		
-		path = abspath("dev-theme/dev_lexers")
-		if exists(path):
-			sys.path.append(path)
-			regex2 = re.compile(r"(^.+)\.py$")
-			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
-			for elt in lexers_list:
-				tmp = __import__(elt)
-				tmp = reload(tmp)
-				cl = tmp.__dict__[elt.capitalize()]
-				name = regex.search(cl.__bases__[0].__name__)
-				name = name.group(0)
-				if name not in default_lexers:
-					name = cl.__name__
-					self.language_extension[name] = [name.lower()]
-				default_lexers[name] = cl()
-		path = abspath("custom_lexers")
-		if exists(path):
-			sys.path.append(path)
-			regex2 = re.compile(r"(^.+)\.py$")
-			lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
-			for elt in lexers_list:
-				tmp = __import__(elt)
-				tmp = reload(tmp)
-				cl = tmp.__dict__[elt.capitalize()]
-				name = regex.search(cl.__bases__[0].__name__)
-				name = name.group(0)
-				if name not in default_lexers:
-					name = cl.__name__
-					self.language_extension[name] = [name.lower()]
-				default_lexers[name] = cl()
-		return default_lexers
+	#~ def _lexer(self):
+		#~ default_lexer_module = __import__("PyQt4.Qsci")
+		#~ regex = re.compile(r"(?<=QsciLexer)(.+)")
+		#~ default_lexers = {}
+		#~ for name, lexer in default_lexer_module.Qsci.__dict__.items():
+			#~ r = regex.search(name)
+			#~ if r and "Custom" not in name:
+				#~ default_lexers[r.group(0)] = lexer()
+		#~ 
+		#~ path = abspath("dev-theme/dev_lexers")
+		#~ if exists(path):
+			#~ sys.path.append(path)
+			#~ regex2 = re.compile(r"(^.+)\.py$")
+			#~ lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
+			#~ for elt in lexers_list:
+				#~ tmp = __import__(elt)
+				#~ tmp = reload(tmp)
+				#~ cl = tmp.__dict__[elt.capitalize()]
+				#~ name = regex.search(cl.__bases__[0].__name__)
+				#~ name = name.group(0)
+				#~ if name not in default_lexers:
+					#~ name = cl.__name__
+					#~ self.language_extension[name] = [name.lower()]
+				#~ default_lexers[name] = cl()
+		#~ path = abspath("custom_lexers")
+		#~ if exists(path):
+			#~ sys.path.append(path)
+			#~ regex2 = re.compile(r"(^.+)\.py$")
+			#~ lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
+			#~ for elt in lexers_list:
+				#~ tmp = __import__(elt)
+				#~ tmp = reload(tmp)
+				#~ cl = tmp.__dict__[elt.capitalize()]
+				#~ name = regex.search(cl.__bases__[0].__name__)
+				#~ name = name.group(0)
+				#~ if name not in default_lexers:
+					#~ name = cl.__name__
+					#~ self.language_extension[name] = [name.lower()]
+				#~ default_lexers[name] = cl()
+		#~ return default_lexers
 	
 	def _lang(self):
 		extension = re.sub(r'.+\.(.+)$', r'\1', self.basename)
@@ -155,14 +159,14 @@ class Editor(QsciScintilla):
 		font.setFixedPitch(True)
 		font.setPointSize(12)
 		self.setFont(font)
-		self.lexers = self._lexer()
+		self.lexers, new_langage = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])
 		self.lang = self._lang()
 		try:
 			self.date = getmtime(self.file_path)
 		except Exception, ex:
 			self.date = -1
 		try:
-			lexer = self.lexers[self.lang]
+			lexer = self.lexers[self.lang]()
 			lexer.setFont(font)
 			self.__auto_completion(lexer)
 			self.setLexer(lexer)

@@ -1,0 +1,27 @@
+-- Category 2 is electronics
+SELECT * FROM Inventory WHERE category = 2;
+
+CREATE TABLE My_table (
+    my_field1   INT,
+    my_field2   VARCHAR (50),
+    my_field3   DATE         NOT NULL,
+    PRIMARY KEY (my_field1, my_field2)
+);
+
+UPDATE My_table
+SET field1 = "updated value"
+WHERE field2 = 'N';
+
+SELECT isbn, title, price, date
+FROM Book
+WHERE price > 100.00
+AND (date = "16042004" OR date = '16042005')
+ORDER BY title;
+
+SELECT title, count(*) AS Authors
+FROM Book
+NATURAL JOIN Book_author
+GROUP BY title;
+
+INSERT INTO My_table (field1, field2, field3)
+VALUES ('test', 'N', NULL);

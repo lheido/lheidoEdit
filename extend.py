@@ -12,11 +12,11 @@ class Extend(object):
 		self.name = kwargs["name_"]
 		self.obj = kwargs["obj_"]
 	
-def extend(langage=None, override=None, name=None):
+def extend(language=None, override=None, name=None):
 	""" 
 User obj definition decorator 
 	how to use:
-		@extend(langage, override, name)
+		@extend(language, override, name)
 		class MyClass(parent)
 	the decorator return an instance of Extend that
 	contains the class defined.
@@ -32,7 +32,7 @@ User obj definition decorator
 	"""
 	def decorator(obj):
 		""" obj is function or class def """
-		return Extend(lang=langage, over=override, name_=name, obj_=obj)
+		return Extend(lang=language, over=override, name_=name, obj_=obj)
 	return decorator
 
 def extend_manager(place="extensions", mth=True):
@@ -49,7 +49,7 @@ Base obj defintion decorator
 	appropriate extension.
 	if mth:
 		methode decorate with extend_manager is replaced by function
-		who check langage and call appropriate function
+		who check language and call appropriate function
 		if you want to override the default methode, just define a
 		class inherit from baseclass (ex: Editor)
 	else: decorate class 

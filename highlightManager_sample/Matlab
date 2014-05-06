@@ -1,0 +1,29 @@
+>> x = 17
+x =
+ 17
+>> x = 'hat'
+x =
+hat
+>> x = [3*4, pi/2]
+x =
+   12.0000    1.5708
+>> A(2:4,3:4)
+ans =
+ 11 8 7
+ 12 14 1
+
+[X,Y] = meshgrid(-10:0.25:10,-10:0.25:10);
+f = sinc(sqrt((X/pi).^2+(Y/pi).^2));
+mesh(X,Y,f);
+axis([-10 10 -10 10 -0.3 1])
+xlabel('{\bfx}')
+ylabel('{\bfy}')
+hidden off
+
+classdef hello
+    methods
+        function doit(this)
+            disp("hello")
+        end
+    end
+end

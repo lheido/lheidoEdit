@@ -3,6 +3,7 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from os.path import exists
 from Editor import Editor
 from GpTab import GpTab
 from settingsDialog import SettingsDialog
@@ -133,7 +134,7 @@ class MainLayout(QWidget):
 			settings.setArrayIndex(i)
 			files_path = str(settings.value("files_path").toString())
 			files_path = files_path.split(";")
-			widgets = [Editor(files, self) for files in files_path]
+			widgets = [Editor(files, self) for files in files_path if exists(files)]
 			self._add_splitter(False, widgets[0])
 			for other in widgets[1:]:
 				self.splitter.widget(i).add_tab(other)

@@ -12,10 +12,10 @@ Basic features :
  - loading the previous session when starting the application.
  - keyboard shortcuts for all actions.
  - code folding.
+ - syntax highlighting manager. (/!\\ save keywords before)
 
 --------------------------------------------------------------------------------
 Other features (coming soon) :
 
- - syntax highlighting manager.
  - execute command in a terminal.
  - snippets.

@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+$foo;     # a scalar
+@foo;     # an array
+%foo;     # a hash
+FOO;      # a file handle
+&foo; # a subroutine (but the & is optional)
+$name = "joe";
+$color = 'red';
+$number1 = 42;
+$number2 = '42';
+# This evaluates to true
+if ($number1 == $number2) {
+	print "Numbers and strings of numbers are the same!";
+}
+$multilined_string =<<EOF;
+This is my multilined string
+note that I am terminating it with the "EOF" word.
+EOF
+my $real_result = $boolean_result + 0;
+push @scores, $_ foreach 32, 45, 16, 5;
+%favorite = (joe => 'red', sam => 'blue');
+# Assigning to a scalar forces scalar context
+$count = @friends;
+while (($name, $address) = each %addressbook) {
+	print "$name lives at $address\n";
+}
+sub either {
+	return wantarray ? (1, 2) : 'Oranges';
+}
+$x = either; # returns "Oranges"
+@x = either; # returns (1, 2)

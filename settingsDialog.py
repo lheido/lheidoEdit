@@ -135,8 +135,8 @@ class SettingsDialog(QDialog):
 		settings.setValue("general/save_geo", self.save_geo.isChecked())
 		settings.setValue("general/valide_fermeture", self.valide_fermeture.isChecked())
 		settings.setValue("general/prec_session", self.prec_session.isChecked())
-		settings.setValue("interface/global_font", self.global_font)
-		settings.setValue("interface/editor_font", self.editor_font)
+		#~ settings.setValue("interface/global_font", self.global_font)
+		#~ settings.setValue("interface/editor_font", self.editor_font)
 		settings.sync()
 		QDialog.accept(self)
 	
