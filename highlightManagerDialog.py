@@ -13,7 +13,7 @@ class Sample(QsciScintilla):
 		self.font = QFont()
 		self.font.setFamily('Ubuntu Mono')
 		self.font.setFixedPitch(True)
-		self.font.setPointSize(12)
+		self.font.setPointSize(11)
 	
 	def open_sample(self, name):
 		try:
@@ -118,7 +118,7 @@ class HighlightManagerDialog(QDialog):
 		self.addAction(quitter)
 		# resize window
 		screen = QDesktopWidget().availableGeometry()
-		coef = 0.5
+		coef = 0.6
 		self.resize(screen.width()*coef, screen.height()*coef)
 		size =  self.geometry()
 		self.setGeometry((screen.width() - size.width())/2, (screen.height() - size.height())/2, size.width(), size.height())
@@ -133,11 +133,12 @@ class HighlightManagerDialog(QDialog):
 	
 	def color_choice(self):
 		color = QColorDialog.getColor(self.bg_color_button)
-		self.color_button.setStyleSheet("background-color: {0};".format(color.name()))
-		self.color_label.setText(u"rgb({0}, {1}, {2})".format(*color.getRgb()))
-		items = self.items_from_Qsci(str(self.language.currentText()))
-		self.current_lexer.setColor(color, items[str(self.select_enum.currentText())])
-		self.sample.update_lexer(str(self.language.currentText()), self.current_lexer)
+		if color.isValid():
+			self.color_button.setStyleSheet("background-color: {0};".format(color.name()))
+			self.color_label.setText(u"rgb({0}, {1}, {2})".format(*color.getRgb()))
+			items = self.items_from_Qsci(str(self.language.currentText()))
+			self.current_lexer.setColor(color, items[str(self.select_enum.currentText())])
+			self.sample.update_lexer(str(self.language.currentText()), self.current_lexer)
 	
 	def enum_changed(self, name):
 		if not name.isEmpty():

@@ -40,13 +40,20 @@ class Editor(QsciScintilla):
 		else:
 			self.new_file()
 		self.modificationChanged[bool].connect(self.modifChanged)
+		
+		# scintilla commands
+		#~ commands = self.standardCommands()
+		#~ print commands.find(QsciCommand.LineDelete).key(), QKeySequence(commands.find(QsciCommand.LineDelete).key()).__int__()
+		#~ for cmd in commands.commands():
+			#~ print cmd.description(), "==>", QKeySequence(cmd.key()).toString()
+		
 		#~ self.menu = self.createStandardContextMenu()
-		#~ action = self.menu.addAction(u"Delete line", self, SLOT(self.delete_line()))
+		#~ action = self.menu.addAction(u"Delete line")
 		#~ stdCmd = self.standardCommands()
 		#~ cmd = stdCmd.find(QsciCommand.LineDelete)
 		#~ if cmd and cmd.key():
 			#~ action.setShortcut(QKeySequence(cmd.key()))
-		#~ action.setEnabled(False)
+		#~ action.setEnabled(True)
 	#~ 
 	#~ def delete_line(self):
 		#~ self.SendScintilla(QsciScintilla.SCI_LINEDELETE, 0, 0)
@@ -60,47 +67,6 @@ class Editor(QsciScintilla):
 	
 	def get_path (self):
 		return self.file_path
-	
-	#~ def _lexer(self):
-		#~ default_lexer_module = __import__("PyQt4.Qsci")
-		#~ regex = re.compile(r"(?<=QsciLexer)(.+)")
-		#~ default_lexers = {}
-		#~ for name, lexer in default_lexer_module.Qsci.__dict__.items():
-			#~ r = regex.search(name)
-			#~ if r and "Custom" not in name:
-				#~ default_lexers[r.group(0)] = lexer()
-		#~ 
-		#~ path = abspath("dev-theme/dev_lexers")
-		#~ if exists(path):
-			#~ sys.path.append(path)
-			#~ regex2 = re.compile(r"(^.+)\.py$")
-			#~ lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
-			#~ for elt in lexers_list:
-				#~ tmp = __import__(elt)
-				#~ tmp = reload(tmp)
-				#~ cl = tmp.__dict__[elt.capitalize()]
-				#~ name = regex.search(cl.__bases__[0].__name__)
-				#~ name = name.group(0)
-				#~ if name not in default_lexers:
-					#~ name = cl.__name__
-					#~ self.language_extension[name] = [name.lower()]
-				#~ default_lexers[name] = cl()
-		#~ path = abspath("custom_lexers")
-		#~ if exists(path):
-			#~ sys.path.append(path)
-			#~ regex2 = re.compile(r"(^.+)\.py$")
-			#~ lexers_list = [regex2.sub(r"\1", elt) for elt in listdir(path) if regex2.search(elt)]
-			#~ for elt in lexers_list:
-				#~ tmp = __import__(elt)
-				#~ tmp = reload(tmp)
-				#~ cl = tmp.__dict__[elt.capitalize()]
-				#~ name = regex.search(cl.__bases__[0].__name__)
-				#~ name = name.group(0)
-				#~ if name not in default_lexers:
-					#~ name = cl.__name__
-					#~ self.language_extension[name] = [name.lower()]
-				#~ default_lexers[name] = cl()
-		#~ return default_lexers
 	
 	def _lang(self):
 		extension = re.sub(r'.+\.(.+)$', r'\1', self.basename)
@@ -157,7 +123,7 @@ class Editor(QsciScintilla):
 		font = QFont()
 		font.setFamily('Ubuntu Mono')
 		font.setFixedPitch(True)
-		font.setPointSize(12)
+		font.setPointSize(11)
 		self.setFont(font)
 		self.lexers, new_langage = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])
 		self.lang = self._lang()
@@ -197,6 +163,12 @@ class Editor(QsciScintilla):
 		if settings.value("editeur/pliage", QVariant(True)).toBool():
 			self.setFolding(QsciScintilla.BoxedTreeFoldStyle)
 			self.setFoldMarginColors(QColor("#242424"), QColor("#242424"))
+		# shortcuts
+		cmds = self.standardCommands().commands()
+		for cmd in cmds:
+			command = cmd.command()
+			key = settings.value("shortcut/{0}".format(command), QKeySequence(cmd.key()).toString()).toString()
+			cmd.setKey(QKeySequence(key).__int__())
 		self.update()
 	
 	def __auto_completion(self, lexer):

@@ -3,7 +3,111 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla, QsciCommand
 
+class ShortcutsTable(QTableWidget):
+	""" custom widget for manage shortcut """
+	def __init__(self, editor=True, parent=None):
+		super(ShortcutsTable, self).__init__(parent)
+		self.setSortingEnabled(False)
+		self.setColumnCount(3)
+		header = self.horizontalHeader()
+		self.setHorizontalHeaderLabels(["id","Raccourcis","Description"])
+		self.setColumnHidden(0, True)
+		header.setResizeMode(QHeaderView.Interactive)
+		header.setDefaultSectionSize(200)
+		self.setAlternatingRowColors(True)
+		header.setStretchLastSection(True)
+		self.verticalHeader().setVisible(False)
+		if editor:
+			self.shortcut_editor()
+		else:
+			self.shortcut_ui()
+		self.itemChanged.connect(self.item_changed)
+	
+	def shortcut_editor(self):
+		settings = QSettings("lheido", "lheidoEdit")
+		editor = QsciScintilla()
+		cmds = editor.standardCommands().commands()
+		self.id_key = {}
+		for i, cmd in enumerate(cmds):
+			self.insertRow(self.rowCount())
+			command = str(cmd.command())
+			key = settings.value("shortcut/{0}".format(command), QKeySequence(cmd.key()).toString()).toString()
+			id_item = QTableWidgetItem()
+			id_item.setText(command)
+			shortcut_item = QTableWidgetItem()
+			shortcut_item.setText(key)
+			description_item = QTableWidgetItem()
+			description_item.setText(cmd.description())
+			description_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled )
+			self.setItem(i, 0, id_item)
+			self.setItem(i, 1, shortcut_item)
+			self.setItem(i, 2, description_item)
+			self.id_key[command] = key
+	
+	def shortcut_ui(self):
+		settings = QSettings("lheido", "lheidoEdit")
+		description = {
+			"Quit":         u"Quitter l'éditeur",
+			"Open": 	    u"Ouvrir un fichier dans le groupe courant",
+			"OpenNewGp":    u"Ouvrir un fichier dans un nouveau groupe",
+			"NewFile":      u"Nouveau fichier dans le groupe courant",
+			"Save":         u"Enregistrer le fichier courant",
+			"SaveAs":       u"Enregistrer le fichier courant sous",
+			"ChangeGp":     u"Donne le focus au groupe suivant",
+			"NextTab":      u"Onglet suivant",
+			"PrevTab":      u"Onglet précédent",
+			"NewGp":        u"Nouveau groupe",
+			"TabNextGp":    u"Onglet courant vers groupe suivant",
+			"TabPrevGp":   u"Onglet courant vers groupe précédent",
+			"CloseTab":     u"Fermer l'onglet courant",
+			"CloseGp":      u"Fermer le groupe de l'onglet courant",
+			"ToggleMenuBar":u"Afficher/Cacher la barre de menu",
+			"UserPref":     u"Préférences utilisateur",
+			"HighLightM":   u"Outil d'édition de coloration syntaxique"
+		}
+		self.id_key = {
+			"Quit":         "Ctrl+Q",
+			"Open": 	    "Ctrl+O",
+			"OpenNewGp":    "Ctrl+Shift+O",
+			"NewFile":      "Ctrl+N",
+			"Save":         "Ctrl+S",
+			"SaveAs":       "Ctrl+Shift+S",
+			"ChangeGp":     "Alt+W",
+			"NextTab":      "Alt+<",
+			"PrevTab":      "Alt+Shift+<",
+			"NewGp":        "Ctrl+B",
+			"TabNextGp":    "Ctrl+Shift+B",
+			"TabPrevGp":    "Ctrl+Alt+B",
+			"CloseTab":     "Ctrl+W",
+			"CloseGp":      "Ctrl+Shift+W",
+			"ToggleMenuBar":"Ctrl+F1",
+			"UserPref":     "Ctrl+Alt+P",
+			"HighLightM":   "Ctrl+F2" 
+		}
+		for i, cmd in enumerate(self.id_key):
+			self.insertRow(self.rowCount())
+			id_item = QTableWidgetItem()
+			id_item.setText(cmd)
+			key = settings.value("shortcut/{0}".format(cmd), QVariant("{0}".format(self.id_key[cmd]))).toString()
+			shortcut_item = QTableWidgetItem()
+			shortcut_item.setText(key)
+			description_item = QTableWidgetItem()
+			description_item.setText(description[cmd])
+			description_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled )
+			self.setItem(i, 0, id_item)
+			self.setItem(i, 1, shortcut_item)
+			self.setItem(i, 2, description_item)
+	
+	def item_changed(self, item):
+		row = self.row(item)
+		item_id = self.item(row, 0).text()
+		self.id_key[item_id] = item.text()
+	
+	def get_dict(self):
+		return self.id_key
+	
 class SettingsDialog(QDialog):
 	""" Manage user settings """
 	def __init__ (self, parent=None):
@@ -27,7 +131,7 @@ class SettingsDialog(QDialog):
 		self.vlayout.addLayout(self.hlayout)
 		
 		screen = QDesktopWidget().availableGeometry()
-		coef = 0.5
+		coef = 0.6
 		self.resize(screen.width()*coef, screen.height()*coef)
 		size =  self.geometry()
 		self.setGeometry((screen.width() - size.width())/2, (screen.height() - size.height())/2, size.width(), size.height())
@@ -82,19 +186,26 @@ class SettingsDialog(QDialog):
 		# Interface
 		#~ interface = QWidget(self)
 		#~ interface_box = QVBoxLayout(self)
-		#~ font_global_label = QPushButton(u"Police Pour l'interface", self)
+		#~ font_global_button = QPushButton(u"Police de l'interface", self)
 		#~ if settings.value("interface/global_font", QFont()).to
-		#~ font_global_label.clicked.connect(self.font_global_dialog)
-		#~ font_editor_label = QPushButton(u"Police Pour l'éditeur", self)
-		#~ font_editor_label.clicked.connect(self.font_editor_dialog)
-		i = self.tab.addTab(QWidget(), u"Interface")
+		#~ font_global_button.clicked.connect(self.font_global_dialog)
+		#~ font_editor_button = QPushButton(u"Police de l'éditeur", self)
+		#~ font_editor_button.clicked.connect(self.font_editor_dialog)
+		ui = QWidget(self)
+		layout = QVBoxLayout(ui)
+		shortcut_ui_label = QLabel("Raccourcis clavier")
+		shortcut_ui_label.setObjectName("shortcut_ui_title")
+		self.shortcut_ui = ShortcutsTable(False, None)
+		layout.addWidget(shortcut_ui_label)
+		layout.addWidget(self.shortcut_ui)
+		#~ layout.addStretch(1)
+		i = self.tab.addTab(ui, u"Interface")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
 		# Editeur
 		editeur = QWidget(self)
 		editeur_box = QVBoxLayout(self)
 		layout = QGridLayout(self)
 		editeur_box.addLayout(layout)
-		editeur_box.addStretch(1)
 		layout.setSpacing(10)
 		self.pliage_ch = QCheckBox("Pliage du code", self)
 		if settings.value("editeur/pliage", QVariant(True)).toBool():
@@ -115,16 +226,21 @@ class SettingsDialog(QDialog):
 		self.tab_type_cb.addItem("espace")
 		self.tab_type_cb.addItem("tabulation")
 		self.tab_type_cb.setCurrentIndex(settings.value("editeur/indent_type", QVariant(0)).toInt()[0])
-		edit_widget = [self.pliage_ch, indentTitle, tab_width, self.tab_width_spin, tab_type, self.tab_type_cb]
-		edit_pos = [(0, 0), (1,0,1,2), (2,0), (2,1), (3,0), (3,1)]
+		shortcut_edit_label = QLabel("Raccourcis clavier")
+		shortcut_edit_label.setObjectName("shortcut_edit_title")
+		self.shortcut_edit = ShortcutsTable()
+		edit_widget = [self.pliage_ch, indentTitle, tab_width, self.tab_width_spin, tab_type, self.tab_type_cb, shortcut_edit_label, self.shortcut_edit]
+		edit_pos = [(0, 0), (1,0,1,2), (2,0), (2,1), (3,0), (3,1), (4,0,1,2), (5,0,5,2)]
 		for i, elt in enumerate(edit_widget):
 			layout.addWidget(elt, *edit_pos[i])
+		layout.setRowStretch(5, 1)
 		editeur.setLayout(editeur_box)
 		i = self.tab.addTab(editeur, u"Éditeur")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
-		# Raccourcis
-		i = self.tab.addTab(QWidget(), u"Raccourcis")
-		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
+		#~ # Raccourcis
+		#~ self.shortcuts_table = ShortcutsTable()
+		#~ i = self.tab.addTab(self.shortcuts_table, u"Raccourcis")
+		#~ self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
 		self.vlayout.addWidget(self.tab)
 	
 	def accept(self):
@@ -137,6 +253,12 @@ class SettingsDialog(QDialog):
 		settings.setValue("general/prec_session", self.prec_session.isChecked())
 		#~ settings.setValue("interface/global_font", self.global_font)
 		#~ settings.setValue("interface/editor_font", self.editor_font)
+		shortcuts_editor = self.shortcut_edit.get_dict()
+		for key, val in shortcuts_editor.items():
+			settings.setValue("shortcut/{0}".format(key), val)
+		shortcuts_ui = self.shortcut_ui.get_dict()
+		for key, val in shortcuts_ui.items():
+			settings.setValue("shortcut/{0}".format(key), val)
 		settings.sync()
 		QDialog.accept(self)
 	

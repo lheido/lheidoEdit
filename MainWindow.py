@@ -51,20 +51,21 @@ class MainLayout(QWidget):
 	@extend_manager()
 	def actions(self, **kwargs):
 		""" actions(parent=parent) """
-		kwargs["parent"]._new_action(name="&Diviser", shortcut="ctrl+b", fun=self.add_splitter, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Nouveau fichier", shortcut="ctrl+n", fun=self.__new_file, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Ouvrir un fichier", shortcut="ctrl+o", fun=self.__open_file, menu="Fichier")
-		kwargs["parent"]._new_action(name="Ouvrir un fichier dans un nouveau groupe", shortcut="ctrl+shift+o", fun=self.__open_new_splitter, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Toggle Focus", shortcut="alt+w", fun=self.toggle_focus, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Next tab", shortcut="alt+<", fun=self._next_tab, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Prev tab", shortcut="alt+shift+<", fun=self._prev_tab, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Déplacer onglet vers le groupe suivante", shortcut="ctrl+shift+b", fun=self.move_tab_to_right, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"Déplacer onglet vers le groupe précédent", shortcut="ctrl+alt+b", fun=self.move_tab_to_left, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Enregistrer", shortcut="ctrl+s", fun=self.__save_file, menu="Fichier")
-		kwargs["parent"]._new_action(name="Enregistrer &sous", shortcut="ctrl+shift+s", fun=self.__save_as, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Fermer l'onglet courant", shortcut="ctrl+w", fun=self._remove_tab, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Fermer le groupe d'onglet courant", shortcut="ctrl+shift+w", fun=self._remove_group, menu="Fichier")
-		kwargs["parent"]._new_action(name="Print Focus", shortcut="ctrl+alt+w", fun=self.__get_focus, menu="Fichier")
+		settings = QSettings("lheido", "lheidoEdit")
+		kwargs["parent"]._new_action(name="&Nouveau groupe", shortcut=settings.value("shortcut/NewGp").toString(), fun=self.add_splitter, menu="Affichage")
+		kwargs["parent"]._new_action(name="&Nouveau fichier", shortcut=settings.value("shortcut/NewFile").toString(), fun=self.__new_file, menu="Fichier")
+		kwargs["parent"]._new_action(name="&Ouvrir un fichier", shortcut=settings.value("shortcut/Open").toString(), fun=self.__open_file, menu="Fichier")
+		kwargs["parent"]._new_action(name="Ouvrir un fichier dans un nouveau groupe", shortcut=settings.value("shortcut/OpenNewGp").toString(), fun=self.__open_new_splitter, menu="Fichier")
+		kwargs["parent"]._new_action(name="&Toggle Focus", shortcut=settings.value("shortcut/ChangeGp").toString(), fun=self.toggle_focus, menu="Affichage")
+		kwargs["parent"]._new_action(name="&Next tab", shortcut=settings.value("shortcut/NextTab").toString(), fun=self._next_tab, menu="Affichage")
+		kwargs["parent"]._new_action(name="&Prev tab", shortcut=settings.value("shortcut/PrevTab").toString(), fun=self._prev_tab, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"&Déplacer onglet vers le groupe suivante", shortcut=settings.value("shortcut/TabNextGp").toString(), fun=self.move_tab_to_right, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"Déplacer onglet vers le groupe précédent", shortcut=settings.value("shortcut/TabPrevGp").toString(), fun=self.move_tab_to_left, menu="Affichage")
+		kwargs["parent"]._new_action(name="&Enregistrer", shortcut=settings.value("shortcut/Save").toString(), fun=self.__save_file, menu="Fichier")
+		kwargs["parent"]._new_action(name="Enregistrer &sous", shortcut=settings.value("shortcut/SaveAs").toString(), fun=self.__save_as, menu="Fichier")
+		kwargs["parent"]._new_action(name="&Fermer l'onglet courant", shortcut=settings.value("shortcut/CloseTab").toString(), fun=self._remove_tab, menu="Fichier")
+		kwargs["parent"]._new_action(name="&Fermer le groupe d'onglet courant", shortcut=settings.value("shortcut/CloseGp").toString(), fun=self._remove_group, menu="Fichier")
+		#~ kwargs["parent"]._new_action(name="Print Focus", shortcut="ctrl+alt+w", fun=self.__get_focus, menu="Fichier")
 	
 	@extend_manager()
 	def add_splitter (self):
@@ -276,21 +277,22 @@ class MainWindow(QMainWindow):
 		#~ self.menubar = self.menuBar()
 		self.menubar = MenuBar(self)
 		self.setMenuBar(self.menubar)
-		
+		settings = QSettings("lheido", "lheidoEdit")
 		# add action exit and toggle menubar to mainWindow
 		self.mainLayout = MainLayout(self)
 		self.setCentralWidget(self.mainLayout)
-		self._new_action(name="&Quitter", shortcut="ctrl+q", fun=self.__quit, menu="Fichier")
-		self._new_action(name="&Afficher/cacher la bar de menu", shortcut="ctrl+F1", fun=self._toggle_menu_bar, menu="Affichage")
-		self._new_action(name="&HighlightManager", shortcut="ctrl+F2", fun=self.highlight_manager, menu="Outils")
-		self._new_action(name="&Préférences", shortcut="ctrl+alt+p", fun=self.settings)
+		self._new_action(name="&Quitter", shortcut=settings.value("shortcut/Quit").toString(), fun=self.__quit, menu="Fichier")
+		self._new_action(name="&Afficher/cacher la barre de menu", shortcut=settings.value("shortcut/ToggleMenuBar").toString(), fun=self._toggle_menu_bar, menu="Affichage")
+		self._new_action(name="&HighlightManager", shortcut=settings.value("shortcut/HighLightM").toString(), fun=self.highlight_manager, menu="Outils")
+		self._new_action(name="&Préférences", shortcut=settings.value("shortcut/UserPref").toString(), fun=self.settings)
 		self.__menubar_event()
-		settings = QSettings("lheido", "lheidoEdit")
 		if settings.value("mainwindow/maximized", QVariant(False)).toBool():
 			self.showMaximized()
 		else:
 			self.resize(settings.value("mainwindow/size", QSize(400, 400)).toSize())
 			self.move(settings.value("mainwindow/pos", QPoint(0,0)).toPoint())
+		if settings.value("mainwindow/hideMenuBar", QVariant(False)).toBool():
+			self.menubar.setVisible(False)
 	
 	def __quit(self):
 		reply = QMessageBox.Yes
@@ -304,6 +306,7 @@ class MainWindow(QMainWindow):
 				settings.setValue("mainwindow/size", self.size())
 				settings.setValue("mainwindow/maximized", self.isMaximized())
 				settings.setValue("mainwindow/pos", self.pos())
+				settings.setValue("mainwindow/hideMenuBar", self.menubar.isHidden())
 				settings.sync()
 			self.close()
 	

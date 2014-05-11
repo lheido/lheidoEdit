@@ -6,7 +6,7 @@ QMenuBar, QMainWindow, QFrame, QMenu, QStatusBar, QTabBar::tab, QCheckBox, QDial
 	border: none;
 }
 
-#indentTitle, #demarrageTitle, #fermetureTitle {
+#indentTitle, #demarrageTitle, #fermetureTitle, #shortcut_edit_title, #shortcut_ui_title {
 	padding-left: 10px;
 	margin-top: 10px;
 	border-bottom: 1px solid rgb(84,84,84)
@@ -244,4 +244,27 @@ QComboBox QAbstractItemView {
 	border: none;
 	width: 42px;
 	height: 42px;
+}
+
+QTableView {
+	color: rgb(200,200,200);
+	alternate-background-color: rgb(33,33,33);
+}
+
+QTableView::item:selected {
+	background-color: rgb(100,100,100);
+}
+
+QHeaderView::section {
+	background-color: rgb(64,64,64);
+	color: white;
+	border: none;
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
+
+QLineEdit {
+	background-color: rgb(200,200,200);
+	border: 1px solid rgb(84,84,84);
+	padding: 2px;
 }
