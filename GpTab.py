@@ -138,3 +138,7 @@ class GpTab(QTabWidget):
 		index = self.currentIndex()
 		self.tabBar().setTabTextColor(index, color)
 	
+	def _execute(self):
+		widget = self.widget(self.currentIndex())
+		widget.execute()
+	

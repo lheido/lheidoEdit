@@ -52,20 +52,25 @@ class MainLayout(QWidget):
 	def actions(self, **kwargs):
 		""" actions(parent=parent) """
 		settings = QSettings("lheido", "lheidoEdit")
-		kwargs["parent"]._new_action(name="&Nouveau groupe", shortcut=settings.value("shortcut/NewGp").toString(), fun=self.add_splitter, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Nouveau fichier", shortcut=settings.value("shortcut/NewFile").toString(), fun=self.__new_file, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Ouvrir un fichier", shortcut=settings.value("shortcut/Open").toString(), fun=self.__open_file, menu="Fichier")
-		kwargs["parent"]._new_action(name="Ouvrir un fichier dans un nouveau groupe", shortcut=settings.value("shortcut/OpenNewGp").toString(), fun=self.__open_new_splitter, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Toggle Focus", shortcut=settings.value("shortcut/ChangeGp").toString(), fun=self.toggle_focus, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Next tab", shortcut=settings.value("shortcut/NextTab").toString(), fun=self._next_tab, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Prev tab", shortcut=settings.value("shortcut/PrevTab").toString(), fun=self._prev_tab, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"&Nouveau groupe", shortcut=settings.value("shortcut/NewGp").toString(), fun=self.add_splitter, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"&Nouveau fichier", shortcut=settings.value("shortcut/NewFile").toString(), fun=self.__new_file, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"&Ouvrir un fichier", shortcut=settings.value("shortcut/Open").toString(), fun=self.__open_file, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"Ouvrir un fichier dans un nouveau groupe", shortcut=settings.value("shortcut/OpenNewGp").toString(), fun=self.__open_new_splitter, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"&Toggle Focus", shortcut=settings.value("shortcut/ChangeGp").toString(), fun=self.toggle_focus, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"&Next tab", shortcut=settings.value("shortcut/NextTab").toString(), fun=self._next_tab, menu="Affichage")
+		kwargs["parent"]._new_action(name=u"&Prev tab", shortcut=settings.value("shortcut/PrevTab").toString(), fun=self._prev_tab, menu="Affichage")
 		kwargs["parent"]._new_action(name=u"&Déplacer onglet vers le groupe suivante", shortcut=settings.value("shortcut/TabNextGp").toString(), fun=self.move_tab_to_right, menu="Affichage")
 		kwargs["parent"]._new_action(name=u"Déplacer onglet vers le groupe précédent", shortcut=settings.value("shortcut/TabPrevGp").toString(), fun=self.move_tab_to_left, menu="Affichage")
-		kwargs["parent"]._new_action(name="&Enregistrer", shortcut=settings.value("shortcut/Save").toString(), fun=self.__save_file, menu="Fichier")
-		kwargs["parent"]._new_action(name="Enregistrer &sous", shortcut=settings.value("shortcut/SaveAs").toString(), fun=self.__save_as, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Fermer l'onglet courant", shortcut=settings.value("shortcut/CloseTab").toString(), fun=self._remove_tab, menu="Fichier")
-		kwargs["parent"]._new_action(name="&Fermer le groupe d'onglet courant", shortcut=settings.value("shortcut/CloseGp").toString(), fun=self._remove_group, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"&Enregistrer", shortcut=settings.value("shortcut/Save").toString(), fun=self.__save_file, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"Enregistrer &sous", shortcut=settings.value("shortcut/SaveAs").toString(), fun=self.__save_as, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"&Fermer l'onglet courant", shortcut=settings.value("shortcut/CloseTab").toString(), fun=self._remove_tab, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"Fermer le groupe d'onglet courant", shortcut=settings.value("shortcut/CloseGp").toString(), fun=self._remove_group, menu="Fichier")
+		kwargs["parent"]._new_action(name=u"Exécuter", shortcut=settings.value("shortcut/Execute").toString(), fun=self._execute, menu="Outils")
 		#~ kwargs["parent"]._new_action(name="Print Focus", shortcut="ctrl+alt+w", fun=self.__get_focus, menu="Fichier")
+	
+	def _execute(self):
+		grp = self.splitter.widget(self._retrieve_focus())
+		grp._execute()
 	
 	@extend_manager()
 	def add_splitter (self):

@@ -60,12 +60,13 @@ class ShortcutsTable(QTableWidget):
 			"PrevTab":      u"Onglet précédent",
 			"NewGp":        u"Nouveau groupe",
 			"TabNextGp":    u"Onglet courant vers groupe suivant",
-			"TabPrevGp":   u"Onglet courant vers groupe précédent",
+			"TabPrevGp":    u"Onglet courant vers groupe précédent",
 			"CloseTab":     u"Fermer l'onglet courant",
 			"CloseGp":      u"Fermer le groupe de l'onglet courant",
 			"ToggleMenuBar":u"Afficher/Cacher la barre de menu",
 			"UserPref":     u"Préférences utilisateur",
-			"HighLightM":   u"Outil d'édition de coloration syntaxique"
+			"HighLightM":   u"Outil d'édition de coloration syntaxique",
+			"Execute":      u"Exécuter dans un terminal"
 		}
 		self.id_key = {
 			"Quit":         "Ctrl+Q",
@@ -84,7 +85,8 @@ class ShortcutsTable(QTableWidget):
 			"CloseGp":      "Ctrl+Shift+W",
 			"ToggleMenuBar":"Ctrl+F1",
 			"UserPref":     "Ctrl+Alt+P",
-			"HighLightM":   "Ctrl+F2" 
+			"HighLightM":   "Ctrl+F2", 
+			"Execute":      "F5" 
 		}
 		for i, cmd in enumerate(self.id_key):
 			self.insertRow(self.rowCount())

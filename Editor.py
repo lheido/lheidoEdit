@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 import re
+import subprocess
 from os import listdir
-from os.path import basename, getmtime, abspath, exists
+from os.path import basename, getmtime, abspath, exists, dirname
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -177,3 +178,15 @@ class Editor(QsciScintilla):
 		for mot in regex.findall(self.get_text()):
 			api.add(mot)
 		api.prepare()
+	
+	def execute(self):
+		term = "$COLORTERM -e "
+		exit_term = 'echo; echo; echo ----------------------; echo Program exited with code: $?; echo Press any key to continue; read touche;'
+		path = dirname(self.file_path).replace(" ", "\\ ")
+		if self.lang == "Python":
+			bash = "'bash -c \"cd {0}; python {1}; {2} \"'".format(path, self.basename, exit_term)
+		elif self.lang == "HTML":
+			bash = "'bash -c \"cd {0}; chromium-browser {1}; {2} \"'".format(path, self.basename, exit_term)
+		else:
+			bash = "'bash -c \"cd {0}; echo no rule to execute: {1}; {2} \"'".format(path, self.basename, exit_term)
+		subprocess.call(term + bash, shell=True)
