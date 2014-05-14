@@ -168,7 +168,7 @@ class Editor(QsciScintilla):
 		cmds = self.standardCommands().commands()
 		for cmd in cmds:
 			command = cmd.command()
-			key = settings.value("shortcut/{0}".format(command), QKeySequence(cmd.key()).toString()).toString()
+			key = settings.value("shortcut/{0}".format(command), QVariant("")).toString()
 			cmd.setKey(QKeySequence(key).__int__())
 		self.update()
 	
@@ -180,13 +180,17 @@ class Editor(QsciScintilla):
 		api.prepare()
 	
 	def execute(self):
-		term = "$COLORTERM -e "
+		settings = QSettings("lheido", "lheidoEdit")
+		term = str(settings.value("default/terminal", QVariant("$COLORTERM")).toString())
+		browser = str(settings.value("default/browser").toString())
+		term += " -e "
 		exit_term = 'echo; echo; echo ----------------------; echo Program exited with code: $?; echo Press any key to continue; read touche;'
 		path = dirname(self.file_path).replace(" ", "\\ ")
-		if self.lang == "Python":
-			bash = "'bash -c \"cd {0}; python {1}; {2} \"'".format(path, self.basename, exit_term)
-		elif self.lang == "HTML":
-			bash = "'bash -c \"cd {0}; chromium-browser {1}; {2} \"'".format(path, self.basename, exit_term)
+		command = str(settings.value("languageRule/{0}".format(self.lang)).toString())
+		if command != "":
+			command = command.replace("%f", self.basename).replace("%d", path).replace("%b", browser)
+			if self.lang == "HTML" and browser == "": return
+			bash = "'bash -c \"cd {0}; {1}; {2} \"'".format(path, command, exit_term)
 		else:
-			bash = "'bash -c \"cd {0}; echo no rule to execute: {1}; {2} \"'".format(path, self.basename, exit_term)
+			bash = "'bash -c \"cd {0}; echo no rule to execute: {1}; {2} \"'".format(path, self.basename, exit_term)			
 		subprocess.call(term + bash, shell=True)

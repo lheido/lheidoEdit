@@ -34,7 +34,6 @@ class MainLayout(QWidget):
 	
 	def __init__ (self, parent=None):
 		super(MainLayout, self).__init__(parent)
-		self.action_manager = {"new_action": parent._new_action, "new_menu": parent._new_menu}
 		self.Hbox = QHBoxLayout(parent)
 		self.splitter = Splitter(Qt.Horizontal)
 		settings = QSettings("lheido", "lheidoEdit")
@@ -52,20 +51,20 @@ class MainLayout(QWidget):
 	def actions(self, **kwargs):
 		""" actions(parent=parent) """
 		settings = QSettings("lheido", "lheidoEdit")
-		kwargs["parent"]._new_action(name=u"&Nouveau groupe", shortcut=settings.value("shortcut/NewGp").toString(), fun=self.add_splitter, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Nouveau fichier", shortcut=settings.value("shortcut/NewFile").toString(), fun=self.__new_file, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"&Ouvrir un fichier", shortcut=settings.value("shortcut/Open").toString(), fun=self.__open_file, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"Ouvrir un fichier dans un nouveau groupe", shortcut=settings.value("shortcut/OpenNewGp").toString(), fun=self.__open_new_splitter, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"&Toggle Focus", shortcut=settings.value("shortcut/ChangeGp").toString(), fun=self.toggle_focus, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Next tab", shortcut=settings.value("shortcut/NextTab").toString(), fun=self._next_tab, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Prev tab", shortcut=settings.value("shortcut/PrevTab").toString(), fun=self._prev_tab, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Déplacer onglet vers le groupe suivante", shortcut=settings.value("shortcut/TabNextGp").toString(), fun=self.move_tab_to_right, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"Déplacer onglet vers le groupe précédent", shortcut=settings.value("shortcut/TabPrevGp").toString(), fun=self.move_tab_to_left, menu="Affichage")
-		kwargs["parent"]._new_action(name=u"&Enregistrer", shortcut=settings.value("shortcut/Save").toString(), fun=self.__save_file, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"Enregistrer &sous", shortcut=settings.value("shortcut/SaveAs").toString(), fun=self.__save_as, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"&Fermer l'onglet courant", shortcut=settings.value("shortcut/CloseTab").toString(), fun=self._remove_tab, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"Fermer le groupe d'onglet courant", shortcut=settings.value("shortcut/CloseGp").toString(), fun=self._remove_group, menu="Fichier")
-		kwargs["parent"]._new_action(name=u"Exécuter", shortcut=settings.value("shortcut/Execute").toString(), fun=self._execute, menu="Outils")
+		kwargs["parent"]._new_action(identifier="NewGp", name=u"&Nouveau groupe", shortcut=settings.value("shortcut/NewGp").toString(), fun=self.add_splitter, menu="Affichage")
+		kwargs["parent"]._new_action(identifier="NewFile", name=u"&Nouveau fichier", shortcut=settings.value("shortcut/NewFile").toString(), fun=self.__new_file, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="Open", name=u"&Ouvrir un fichier", shortcut=settings.value("shortcut/Open").toString(), fun=self.__open_file, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="OpenNewGp", name=u"Ouvrir un fichier dans un nouveau groupe", shortcut=settings.value("shortcut/OpenNewGp").toString(), fun=self.__open_new_splitter, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="ChangeGp", name=u"&Toggle Focus", shortcut=settings.value("shortcut/ChangeGp").toString(), fun=self.toggle_focus, menu="Affichage")
+		kwargs["parent"]._new_action(identifier="NextTab", name=u"&Next tab", shortcut=settings.value("shortcut/NextTab").toString(), fun=self._next_tab, menu="Affichage")
+		kwargs["parent"]._new_action(identifier="PrevTab", name=u"&Prev tab", shortcut=settings.value("shortcut/PrevTab").toString(), fun=self._prev_tab, menu="Affichage")
+		kwargs["parent"]._new_action(identifier="TabNextGp", name=u"&Déplacer onglet vers le groupe suivante", shortcut=settings.value("shortcut/TabNextGp").toString(), fun=self.move_tab_to_right, menu="Affichage")
+		kwargs["parent"]._new_action(identifier="TabPrevGp", name=u"Déplacer onglet vers le groupe précédent", shortcut=settings.value("shortcut/TabPrevGp").toString(), fun=self.move_tab_to_left, menu="Affichage")
+		kwargs["parent"]._new_action(identifier="Save", name=u"&Enregistrer", shortcut=settings.value("shortcut/Save").toString(), fun=self.__save_file, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="SaveAs", name=u"Enregistrer &sous", shortcut=settings.value("shortcut/SaveAs").toString(), fun=self.__save_as, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="CloseTab", name=u"&Fermer l'onglet courant", shortcut=settings.value("shortcut/CloseTab").toString(), fun=self._remove_tab, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="CloseGp", name=u"Fermer le groupe d'onglet courant", shortcut=settings.value("shortcut/CloseGp").toString(), fun=self._remove_group, menu="Fichier")
+		kwargs["parent"]._new_action(identifier="Execute", name=u"Exécuter", shortcut=settings.value("shortcut/Execute").toString(), fun=self._execute, menu="Outils")
 		#~ kwargs["parent"]._new_action(name="Print Focus", shortcut="ctrl+alt+w", fun=self.__get_focus, menu="Fichier")
 	
 	def _execute(self):
@@ -210,6 +209,10 @@ class MainLayout(QWidget):
 	def _clear_focus(self):
 		for i in range(self.splitter.count()):
 			self.splitter.widget(i)._clear_focus()
+	
+	def _update(self):
+		for i in xrange(self.splitter.count()):
+			self.splitter.widget(i)._update()
 
 class MenuBar(QMenuBar):
 	
@@ -282,14 +285,15 @@ class MainWindow(QMainWindow):
 		#~ self.menubar = self.menuBar()
 		self.menubar = MenuBar(self)
 		self.setMenuBar(self.menubar)
+		self._actions = {}
 		settings = QSettings("lheido", "lheidoEdit")
 		# add action exit and toggle menubar to mainWindow
 		self.mainLayout = MainLayout(self)
 		self.setCentralWidget(self.mainLayout)
-		self._new_action(name="&Quitter", shortcut=settings.value("shortcut/Quit").toString(), fun=self.__quit, menu="Fichier")
-		self._new_action(name="&Afficher/cacher la barre de menu", shortcut=settings.value("shortcut/ToggleMenuBar").toString(), fun=self._toggle_menu_bar, menu="Affichage")
-		self._new_action(name="&HighlightManager", shortcut=settings.value("shortcut/HighLightM").toString(), fun=self.highlight_manager, menu="Outils")
-		self._new_action(name="&Préférences", shortcut=settings.value("shortcut/UserPref").toString(), fun=self.settings)
+		self._new_action(identifier="Quit", name=u"&Quitter", shortcut=settings.value("shortcut/Quit").toString(), fun=self.__quit, menu="Fichier")
+		self._new_action(identifier="ToggleMenuBar", name=u"&Afficher/cacher la barre de menu", shortcut=settings.value("shortcut/ToggleMenuBar").toString(), fun=self._toggle_menu_bar, menu="Affichage")
+		self._new_action(identifier="HighLightM", name=u"&HighlightManager", shortcut=settings.value("shortcut/HighLightM").toString(), fun=self.highlight_manager, menu="Outils")
+		self._new_action(identifier="UserPref", name=u"&Préférences", shortcut=settings.value("shortcut/UserPref").toString(), fun=self.settings)
 		self.__menubar_event()
 		if settings.value("mainwindow/maximized", QVariant(False)).toBool():
 			self.showMaximized()
@@ -315,21 +319,18 @@ class MainWindow(QMainWindow):
 				settings.sync()
 			self.close()
 	
-	def highlight_manager(self):
-		dialog = HighlightManagerDialog(self)
-		dialog.show()
-	
 	@extend_manager()
 	def _toggle_menu_bar(self):
 		self.menubar.setVisible(not self.menubar.isVisible())
 	
 	@extend_manager()
 	def _new_action(self, **kwargs):
-		""" _new_action(name=, shortcut=, fun=, menu=None) """
+		""" _new_action(identifier=, name=, shortcut=, fun=, menu=None) """
 		action = QAction(kwargs["name"], self)
 		action.setShortcut(kwargs["shortcut"])
 		action.triggered.connect(kwargs["fun"])
 		self.addAction(action)
+		self._actions[kwargs["identifier"]] = action
 		if "menu" in kwargs:
 			self.menubar.menus[kwargs["menu"]].addAction(action)
 	
@@ -347,10 +348,26 @@ class MainWindow(QMainWindow):
 	
 	def settings(self):
 		settings = SettingsDialog(self)
-		if settings.exec_():
-			print settings.get_settings()
-		else:
-			print settings.get_error()
+		settings.show()
+		settings.accepted.connect(self.accepted_activate)
+	
+	def highlight_manager(self):
+		dialog = HighlightManagerDialog(self)
+		dialog.show()
+		dialog.accepted.connect(self.accepted_activate)
+	
+	def accepted_activate(self):
+		self.raise_()
+		self.activateWindow()
+		self.mainLayout._update()
+		self.update_actions()
+	
+	def update_actions(self):
+		settings = QSettings("lheido", "lheidoEdit")
+		for action in self.actions():
+			for elt, val in self._actions.items():
+				if action == val:
+					action.setShortcut(str(settings.value("shortcut/{0}".format(elt)).toString()))
 	
 	def toggleMaximized(self, pressed):
 		if pressed: self.showMaximized()

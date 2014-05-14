@@ -248,11 +248,16 @@ QComboBox QAbstractItemView {
 
 QTableView {
 	color: rgb(200,200,200);
+	background-color: rgb(42,42,42);
 	alternate-background-color: rgb(33,33,33);
 }
 
 QTableView::item:selected {
 	background-color: rgb(100,100,100);
+}
+
+QTableView::item:checked {
+	background-color: red;
 }
 
 QHeaderView::section {

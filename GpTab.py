@@ -92,7 +92,7 @@ class GpTab(QTabWidget):
 		if new_index != -1:
 			self.setFocusProxy(self.widget(new_index))
 			self.setFocus(True)
-		self.widget(new_index).update_config()
+			self.widget(new_index).update_config()
 	
 	def get_tab(self):
 		index = self.currentIndex()
@@ -141,4 +141,7 @@ class GpTab(QTabWidget):
 	def _execute(self):
 		widget = self.widget(self.currentIndex())
 		widget.execute()
+	
+	def _update(self):
+		self.widget(self.currentIndex()).update_config()
 	

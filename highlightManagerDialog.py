@@ -53,7 +53,6 @@ class HighlightManagerDialog(QDialog):
 		select_language = QLabel(u"Selection du langage")
 		select_layout.addWidget(select_language)
 		self.language = QComboBox(self)
-		
 		select_layout.addWidget(self.language)
 		select_layout.addStretch(1)
 		# color layout
@@ -93,7 +92,7 @@ class HighlightManagerDialog(QDialog):
 		color_sample.addWidget(self.sample)
 		# quit
 		quit_button = QPushButton("Quitter")
-		quit_button.clicked.connect(self.close)
+		quit_button.clicked.connect(self.accept)
 		quit_layout = QHBoxLayout(self)
 		quit_layout.addStretch(1)
 		quit_layout.addWidget(quit_button)
@@ -114,7 +113,7 @@ class HighlightManagerDialog(QDialog):
 		# action
 		quitter = QAction("Quitter", self)
 		quitter.setShortcut("ctrl+Q")
-		quitter.triggered.connect(self.close)
+		quitter.triggered.connect(self.accept)
 		self.addAction(quitter)
 		# resize window
 		screen = QDesktopWidget().availableGeometry()

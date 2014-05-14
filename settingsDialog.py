@@ -4,111 +4,140 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciCommand
+import load_lexer
 
 class ShortcutsTable(QTableWidget):
 	""" custom widget for manage shortcut """
-	def __init__(self, editor=True, parent=None):
+	UI = {
+			"Quit":         ["Ctrl+Q",		u"Quitter l'éditeur"],
+			"Open": 	    ["Ctrl+O",		u"Ouvrir un fichier dans le groupe courant"],
+			"OpenNewGp":    ["Ctrl+Shift+O",u"Ouvrir un fichier dans un nouveau groupe"],
+			"NewFile":      ["Ctrl+N",		u"Nouveau fichier dans le groupe courant"],
+			"Save":         ["Ctrl+S",		u"Enregistrer le fichier courant"],
+			"SaveAs":       ["Ctrl+Shift+S",u"Enregistrer le fichier courant sous"],
+			"ChangeGp":     ["Alt+W",		u"Donne le focus au groupe suivant"],
+			"NextTab":      ["Alt+<",		u"Onglet suivant"],
+			"PrevTab":      ["Alt+Shift+<",	u"Onglet précédent"],
+			"NewGp":        ["Ctrl+B",		u"Nouveau groupe"],
+			"TabNextGp":    ["Ctrl+Shift+B",u"Onglet courant vers groupe suivant"],
+			"TabPrevGp":    ["Ctrl+Alt+B",	u"Onglet courant vers groupe précédent"],
+			"CloseTab":     ["Ctrl+W",		u"Fermer l'onglet courant"],
+			"CloseGp":      ["Ctrl+Shift+W",u"Fermer le groupe de l'onglet courant"],
+			"ToggleMenuBar":["Ctrl+F1",		u"Afficher/Cacher la barre de menu"],
+			"UserPref":     ["Ctrl+Alt+P",	u"Préférences utilisateur"],
+			"HighLightM":   ["Ctrl+F2",		u"Outil d'édition de coloration syntaxique"],
+			"Execute":      ["F5",			u"Exécuter dans un terminal"] 
+	}
+	def __init__(self, ui=False, language=False, editor=False, parent=None):
 		super(ShortcutsTable, self).__init__(parent)
 		self.setSortingEnabled(False)
-		self.setColumnCount(3)
 		header = self.horizontalHeader()
-		self.setHorizontalHeaderLabels(["id","Raccourcis","Description"])
-		self.setColumnHidden(0, True)
 		header.setResizeMode(QHeaderView.Interactive)
 		header.setDefaultSectionSize(200)
 		self.setAlternatingRowColors(True)
 		header.setStretchLastSection(True)
 		self.verticalHeader().setVisible(False)
+		self.default = None
 		if editor:
+			self.default = self.editorDefaultCmd()
+			self.setColumnCount(3)
+			self.setHorizontalHeaderLabels(["id","Raccourcis","Description"])
+			self.setColumnHidden(0, True)
 			self.shortcut_editor()
-		else:
+		elif ui:
+			self.default = self.UI
+			self.setColumnCount(3)
+			self.setHorizontalHeaderLabels(["id","Raccourcis","Description"])
+			self.setColumnHidden(0, True)
 			self.shortcut_ui()
+		elif language:
+			self.setColumnCount(2)
+			self.setHorizontalHeaderLabels([u"Langage",u"Règle"])
+			self.languages_rules()
 		self.itemChanged.connect(self.item_changed)
+	
+	def editorDefaultCmd(self):
+		editor = QsciScintilla()
+		cmds = editor.standardCommands().commands()
+		return {str(cmd.command()): [QKeySequence(cmd.key()).toString(),cmd.description()] for i, cmd in enumerate(cmds)}
 	
 	def shortcut_editor(self):
 		settings = QSettings("lheido", "lheidoEdit")
-		editor = QsciScintilla()
-		cmds = editor.standardCommands().commands()
+		defaultCmds = self.editorDefaultCmd()
 		self.id_key = {}
-		for i, cmd in enumerate(cmds):
+		for i, cmd in enumerate(defaultCmds):
 			self.insertRow(self.rowCount())
-			command = str(cmd.command())
-			key = settings.value("shortcut/{0}".format(command), QKeySequence(cmd.key()).toString()).toString()
+			key = str(settings.value("shortcut/{0}".format(cmd)).toString())
+			#~ key = str(settings.value("shortcut/{0}".format(cmd), defaultCmds[cmd][0]).toString())
+			#~ key = str(defaultCmds[cmd][0])
 			id_item = QTableWidgetItem()
-			id_item.setText(command)
+			id_item.setText(cmd)
 			shortcut_item = QTableWidgetItem()
 			shortcut_item.setText(key)
 			description_item = QTableWidgetItem()
-			description_item.setText(cmd.description())
+			description_item.setText(defaultCmds[cmd][1])
 			description_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled )
 			self.setItem(i, 0, id_item)
 			self.setItem(i, 1, shortcut_item)
 			self.setItem(i, 2, description_item)
-			self.id_key[command] = key
+			self.id_key[cmd] = [key]
 	
 	def shortcut_ui(self):
 		settings = QSettings("lheido", "lheidoEdit")
-		description = {
-			"Quit":         u"Quitter l'éditeur",
-			"Open": 	    u"Ouvrir un fichier dans le groupe courant",
-			"OpenNewGp":    u"Ouvrir un fichier dans un nouveau groupe",
-			"NewFile":      u"Nouveau fichier dans le groupe courant",
-			"Save":         u"Enregistrer le fichier courant",
-			"SaveAs":       u"Enregistrer le fichier courant sous",
-			"ChangeGp":     u"Donne le focus au groupe suivant",
-			"NextTab":      u"Onglet suivant",
-			"PrevTab":      u"Onglet précédent",
-			"NewGp":        u"Nouveau groupe",
-			"TabNextGp":    u"Onglet courant vers groupe suivant",
-			"TabPrevGp":    u"Onglet courant vers groupe précédent",
-			"CloseTab":     u"Fermer l'onglet courant",
-			"CloseGp":      u"Fermer le groupe de l'onglet courant",
-			"ToggleMenuBar":u"Afficher/Cacher la barre de menu",
-			"UserPref":     u"Préférences utilisateur",
-			"HighLightM":   u"Outil d'édition de coloration syntaxique",
-			"Execute":      u"Exécuter dans un terminal"
-		}
-		self.id_key = {
-			"Quit":         "Ctrl+Q",
-			"Open": 	    "Ctrl+O",
-			"OpenNewGp":    "Ctrl+Shift+O",
-			"NewFile":      "Ctrl+N",
-			"Save":         "Ctrl+S",
-			"SaveAs":       "Ctrl+Shift+S",
-			"ChangeGp":     "Alt+W",
-			"NextTab":      "Alt+<",
-			"PrevTab":      "Alt+Shift+<",
-			"NewGp":        "Ctrl+B",
-			"TabNextGp":    "Ctrl+Shift+B",
-			"TabPrevGp":    "Ctrl+Alt+B",
-			"CloseTab":     "Ctrl+W",
-			"CloseGp":      "Ctrl+Shift+W",
-			"ToggleMenuBar":"Ctrl+F1",
-			"UserPref":     "Ctrl+Alt+P",
-			"HighLightM":   "Ctrl+F2", 
-			"Execute":      "F5" 
-		}
+		self.id_key = self.UI.copy()
 		for i, cmd in enumerate(self.id_key):
 			self.insertRow(self.rowCount())
 			id_item = QTableWidgetItem()
 			id_item.setText(cmd)
-			key = settings.value("shortcut/{0}".format(cmd), QVariant("{0}".format(self.id_key[cmd]))).toString()
+			key = str(settings.value("shortcut/{0}".format(cmd), QVariant("{0}".format(self.id_key[cmd][0]))).toString())
 			shortcut_item = QTableWidgetItem()
 			shortcut_item.setText(key)
 			description_item = QTableWidgetItem()
-			description_item.setText(description[cmd])
+			description_item.setText(self.id_key[cmd][1])
 			description_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled )
 			self.setItem(i, 0, id_item)
 			self.setItem(i, 1, shortcut_item)
 			self.setItem(i, 2, description_item)
 	
+	def languages_rules(self):
+		settings = QSettings("lheido", "lheidoEdit")
+		self.id_key = {}
+		self.lexers = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])[0]
+		for i, name in enumerate(self.lexers):
+			self.insertRow(self.rowCount())
+			self.id_key[name] = [str(settings.value("languageRule/{0}".format(name)).toString())]
+			language = QTableWidgetItem()
+			language.setText(name)
+			language.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			rule = QTableWidgetItem()
+			rule.setText(self.id_key[name][0])
+			self.setItem(i, 0, language)
+			self.setItem(i, 1, rule)
+	
 	def item_changed(self, item):
 		row = self.row(item)
-		item_id = self.item(row, 0).text()
-		self.id_key[item_id] = item.text()
+		item_id = str(self.item(row, 0).text())
+		new_val = str(item.text())
+		existe = False
+		if new_val != "":
+			for key, val in self.id_key.items():
+				if new_val == val[0] and key != item_id:
+					existe = True
+		self.id_key[item_id][0] = new_val
+		color = self.palette().color(QPalette.Base)
+		if row % 2 != 0:
+			color = self.palette().color(QPalette.AlternateBase)
+		if existe:
+			color = QColor(200,42,42)
+		item.setBackgroundColor(color)
 	
 	def get_dict(self):
 		return self.id_key
+	
+	def setToDefault(self):
+		if self.default is not None:
+			for i, key in enumerate(self.default):
+				self.item(i, 1).setText(self.default[key][0])
 	
 class SettingsDialog(QDialog):
 	""" Manage user settings """
@@ -117,7 +146,7 @@ class SettingsDialog(QDialog):
 		self.setWindowTitle(u"Préférences")
 		quitter = QAction("Quitter", self)
 		quitter.setShortcut("ctrl+Q")
-		quitter.triggered.connect(self.close)
+		quitter.triggered.connect(self.reject)
 		self.addAction(quitter)
 		self.vlayout = QVBoxLayout(self)
 		self.setLayout(self.vlayout)
@@ -197,7 +226,7 @@ class SettingsDialog(QDialog):
 		layout = QVBoxLayout(ui)
 		shortcut_ui_label = QLabel("Raccourcis clavier")
 		shortcut_ui_label.setObjectName("shortcut_ui_title")
-		self.shortcut_ui = ShortcutsTable(False, None)
+		self.shortcut_ui = ShortcutsTable(ui=True)
 		layout.addWidget(shortcut_ui_label)
 		layout.addWidget(self.shortcut_ui)
 		#~ layout.addStretch(1)
@@ -230,7 +259,7 @@ class SettingsDialog(QDialog):
 		self.tab_type_cb.setCurrentIndex(settings.value("editeur/indent_type", QVariant(0)).toInt()[0])
 		shortcut_edit_label = QLabel("Raccourcis clavier")
 		shortcut_edit_label.setObjectName("shortcut_edit_title")
-		self.shortcut_edit = ShortcutsTable()
+		self.shortcut_edit = ShortcutsTable(editor=True)
 		edit_widget = [self.pliage_ch, indentTitle, tab_width, self.tab_width_spin, tab_type, self.tab_type_cb, shortcut_edit_label, self.shortcut_edit]
 		edit_pos = [(0, 0), (1,0,1,2), (2,0), (2,1), (3,0), (3,1), (4,0,1,2), (5,0,5,2)]
 		for i, elt in enumerate(edit_widget):
@@ -239,10 +268,32 @@ class SettingsDialog(QDialog):
 		editeur.setLayout(editeur_box)
 		i = self.tab.addTab(editeur, u"Éditeur")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
-		#~ # Raccourcis
+		# Execute rules
+		widget = QWidget(self)
+		default_grid = QGridLayout(self)
+		default_term_label = QLabel(u"Terminal :", self)
+		self.default_term = QLineEdit(self)
+		self.default_term.setText(settings.value("default/terminal").toString())
+		default_browser_label = QLabel(u"Navigateur :", self)
+		self.default_browser = QLineEdit(self)
+		self.default_browser.setText(settings.value("default/browser").toString())
+		self.rules = ShortcutsTable(language=True)
+		default_grid.addWidget(default_term_label, 0, 0)
+		default_grid.addWidget(self.default_term, 0, 1)
+		default_grid.addWidget(default_browser_label, 1, 0)
+		default_grid.addWidget(self.default_browser, 1, 1)
+		default_grid.addWidget(self.rules, 2, 0, 2, 2)
+		#~ select_layout = QHBoxLayout(self)
+		#~ select_language = QLabel(u"Selection du langage")
+		#~ select_layout.addWidget(select_language)
+		#~ self.language = QComboBox(self)
+		#~ self.lexers = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])[0]
+		#~ for name in self.lexers:
+			#~ self.language.addItem(name)
 		#~ self.shortcuts_table = ShortcutsTable()
-		#~ i = self.tab.addTab(self.shortcuts_table, u"Raccourcis")
-		#~ self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
+		widget.setLayout(default_grid)
+		i = self.tab.addTab(widget, u"Exécuter")
+		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
 		self.vlayout.addWidget(self.tab)
 	
 	def accept(self):
@@ -257,10 +308,15 @@ class SettingsDialog(QDialog):
 		#~ settings.setValue("interface/editor_font", self.editor_font)
 		shortcuts_editor = self.shortcut_edit.get_dict()
 		for key, val in shortcuts_editor.items():
-			settings.setValue("shortcut/{0}".format(key), val)
+			settings.setValue("shortcut/{0}".format(key), val[0])
 		shortcuts_ui = self.shortcut_ui.get_dict()
 		for key, val in shortcuts_ui.items():
-			settings.setValue("shortcut/{0}".format(key), val)
+			settings.setValue("shortcut/{0}".format(key), val[0])
+		rule = self.rules.get_dict()
+		for key, val in rule.items():
+			settings.setValue("languageRule/{0}".format(key), val[0])
+		settings.setValue("default/terminal", self.default_term.text())
+		settings.setValue("default/browser", self.default_browser.text())
 		settings.sync()
 		QDialog.accept(self)
 	
@@ -282,7 +338,7 @@ class SettingsDialog(QDialog):
 			self.editor_font = font
 	
 	def get_settings(self):
-		return "settings saved"
+		print "settings saved"
 		#~ return self.settings
 	
 	def get_error(self):
