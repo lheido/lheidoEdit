@@ -256,10 +256,6 @@ QTableView::item:selected {
 	background-color: rgb(100,100,100);
 }
 
-QTableView::item:checked {
-	background-color: red;
-}
-
 QHeaderView::section {
 	background-color: rgb(64,64,64);
 	color: white;
@@ -270,6 +266,7 @@ QHeaderView::section {
 
 QLineEdit {
 	background-color: rgb(200,200,200);
+	selection-background-color: rgb(100,100,100);
 	border: 1px solid rgb(84,84,84);
 	padding: 2px;
 }

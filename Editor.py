@@ -3,8 +3,7 @@
 import re
 import subprocess
 from os import listdir
-from os.path import basename, getmtime, abspath, exists, dirname
-import sys
+from os.path import basename, getmtime, dirname
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciCommand
@@ -134,8 +133,13 @@ class Editor(QsciScintilla):
 			self.date = -1
 		try:
 			lexer = self.lexers[self.lang]()
+			#~ api = QsciAPIs(lexer)
+			#~ regex = re.compile(r"([a-zA-Z0-9#_]{5,})[.]*", re.MULTILINE)
+			#~ for mot in regex.findall(self.get_text()):
+				#~ api.add(mot)
+			#~ api.prepare()
+			#~ self.__auto_completion(lexer)
 			lexer.setFont(font)
-			self.__auto_completion(lexer)
 			self.setLexer(lexer)
 		except Exception, ex:
 			print "erreur lexer update", ex
@@ -155,12 +159,13 @@ class Editor(QsciScintilla):
 		self.setCaretForegroundColor(QColor("#FFFFFF"))
 		self.setIndentationGuides(True)
 		self.setIndentationGuidesForegroundColor(QColor(23,23,23))
+		#~ self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
+		self.setAutoCompletionSource(QsciScintilla.AcsDocument)
+		self.setAutoCompletionThreshold(4)
 		if settings.value("editeur/indent_type").toInt() == 1:
 			self.setIndentationsUseTabs(True)
 		self.setTabWidth(settings.value("editeur/indent_width", QVariant(4)).toInt()[0])
 		self.setAutoIndent(True)
-		self.setAutoCompletionThreshold(4)
-		self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
 		if settings.value("editeur/pliage", QVariant(True)).toBool():
 			self.setFolding(QsciScintilla.BoxedTreeFoldStyle)
 			self.setFoldMarginColors(QColor("#242424"), QColor("#242424"))
@@ -194,3 +199,19 @@ class Editor(QsciScintilla):
 		else:
 			bash = "'bash -c \"cd {0}; echo no rule to execute: {1}; {2} \"'".format(path, self.basename, exit_term)			
 		subprocess.call(term + bash, shell=True)
+	
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_Tab:
+			line, index = self.getCursorPosition()
+			word = self.wordAtLeft(line, index)
+			if word:
+				self.setSelection(line, index - len(word), line, index)
+			else:
+				super(Editor, self).keyPressEvent(event)
+		else:
+			super(Editor, self).keyPressEvent(event)
+	
+	def wordAtLeft(self, line, index):
+		word = self.text(line)[:index]
+		word = word.replace(QRegExp("\W"), " ")
+		return str(word).split(" ")[-1]

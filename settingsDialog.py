@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+import copy
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciCommand
@@ -84,7 +85,7 @@ class ShortcutsTable(QTableWidget):
 	
 	def shortcut_ui(self):
 		settings = QSettings("lheido", "lheidoEdit")
-		self.id_key = self.UI.copy()
+		self.id_key = copy.deepcopy(self.UI)
 		for i, cmd in enumerate(self.id_key):
 			self.insertRow(self.rowCount())
 			id_item = QTableWidgetItem()
@@ -136,8 +137,9 @@ class ShortcutsTable(QTableWidget):
 	
 	def setToDefault(self):
 		if self.default is not None:
-			for i, key in enumerate(self.default):
-				self.item(i, 1).setText(self.default[key][0])
+			for i in xrange(len(self.default)):
+				item_id = str(self.item(i, 0).text())
+				self.item(i, 1).setText(self.default[item_id][0])
 	
 class SettingsDialog(QDialog):
 	""" Manage user settings """
@@ -227,8 +229,14 @@ class SettingsDialog(QDialog):
 		shortcut_ui_label = QLabel("Raccourcis clavier")
 		shortcut_ui_label.setObjectName("shortcut_ui_title")
 		self.shortcut_ui = ShortcutsTable(ui=True)
+		default_button = QPushButton(u"Réinitialiser les raccourcis clavier")
+		default_button.clicked.connect(self.shortcut_ui.setToDefault)
+		hbox = QHBoxLayout(self)
+		hbox.addWidget(default_button)
+		hbox.addStretch(1)
 		layout.addWidget(shortcut_ui_label)
 		layout.addWidget(self.shortcut_ui)
+		layout.addLayout(hbox)
 		#~ layout.addStretch(1)
 		i = self.tab.addTab(ui, u"Interface")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
@@ -260,11 +268,13 @@ class SettingsDialog(QDialog):
 		shortcut_edit_label = QLabel("Raccourcis clavier")
 		shortcut_edit_label.setObjectName("shortcut_edit_title")
 		self.shortcut_edit = ShortcutsTable(editor=True)
-		edit_widget = [self.pliage_ch, indentTitle, tab_width, self.tab_width_spin, tab_type, self.tab_type_cb, shortcut_edit_label, self.shortcut_edit]
-		edit_pos = [(0, 0), (1,0,1,2), (2,0), (2,1), (3,0), (3,1), (4,0,1,2), (5,0,5,2)]
+		default_button = QPushButton(u"Réinitialiser les raccourcis clavier")
+		default_button.clicked.connect(self.shortcut_edit.setToDefault)
+		edit_widget = [self.pliage_ch, indentTitle, tab_width, self.tab_width_spin, tab_type, self.tab_type_cb, shortcut_edit_label, self.shortcut_edit, default_button]
+		edit_pos = [(0, 0), (1,0,1,2), (2,0), (2,1), (3,0), (3,1), (4,0,1,2), (5,0,1,2), (7,0)]
 		for i, elt in enumerate(edit_widget):
 			layout.addWidget(elt, *edit_pos[i])
-		layout.setRowStretch(5, 1)
+		layout.setRowStretch(7, 1)
 		editeur.setLayout(editeur_box)
 		i = self.tab.addTab(editeur, u"Éditeur")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))

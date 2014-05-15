@@ -3,7 +3,7 @@
 import re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciScintilla
+from PyQt4.Qsci import QsciScintilla, QsciAPIs
 import load_lexer
 
 class Sample(QsciScintilla):
@@ -32,6 +32,13 @@ class Sample(QsciScintilla):
 			lexers, other = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])
 			lexer = lexers[name]()
 		else: lexer = lex
+		api = QsciAPIs(lexer)
+		regex = re.compile(r"([a-zA-Z0-9#_]{5,})[.]*", re.MULTILINE)
+		for mot in regex.findall(str(self.text())):
+			api.add(mot)
+		api.prepare()
+		self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
+		self.setAutoCompletionThreshold(1)
 		lexer.setFont(self.font)
 		self.setLexer(lexer)
 		fontmetrics = QFontMetrics(self.font)
