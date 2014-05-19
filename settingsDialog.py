@@ -140,7 +140,51 @@ class ShortcutsTable(QTableWidget):
 			for i in xrange(len(self.default)):
 				item_id = str(self.item(i, 0).text())
 				self.item(i, 1).setText(self.default[item_id][0])
+
+class SnippetsTable(QTableWidget):
+	def __init__(self, parent=None):
+		super(SnippetsTable, self).__init__(parent)
+		self.setSortingEnabled(False)
+		header = self.horizontalHeader()
+		header.setResizeMode(QHeaderView.Interactive)
+		header.setDefaultSectionSize(200)
+		self.setAlternatingRowColors(True)
+		header.setStretchLastSection(True)
+		self.verticalHeader().setVisible(False)
+		self.setColumnCount(2)
+		self.setHorizontalHeaderLabels(["Key",u"Snippets"])
 	
+	def fillTable(self, lang):
+		self.lang = lang
+		settings = QSettings("lheido", "lheidoEdit")
+		for i in xrange(self.rowCount()):
+			self.removeRow(i)
+		settings.beginGroup("snippets/{0}".format(lang))
+		self.keys = {str(key): str(settings.value("{1}".format(lang, key)).toString()) for key in settings.childKeys()}
+		settings.endGroup()
+		for i, key in enumerate(self.keys):
+			self.insertRow(self.rowCount())
+			key_item = QTableWidgetItem()
+			key_item.setText(key)
+			value_item = QTableWidgetItem()
+			value_item.setText(self.keys[key])
+			print key, self.keys[key]
+			self.setItem(i, 0, key_item)
+			self.setItem(i, 1, value_item)
+		self.insertRow(self.rowCount())
+		self.setItem(self.rowCount(), 0, QTableWidgetItem())
+		self.setItem(self.rowCount(), 1, QTableWidgetItem())
+	
+	def getKeysValues(self):
+		res = {}
+		for i in xrange(self.rowCount()):
+			key_item = self.item(i, 0)
+			value_item = self.item(i, 1)
+			if key_item and value_item:
+				key = "snippets/{0}/{1}".format(self.lang, str(key_item.text())) 
+				res[key] = str(value_item.text())
+		return res
+
 class SettingsDialog(QDialog):
 	""" Manage user settings """
 	def __init__ (self, parent=None):
@@ -304,7 +348,38 @@ class SettingsDialog(QDialog):
 		widget.setLayout(default_grid)
 		i = self.tab.addTab(widget, u"Exécuter")
 		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
+		# snippets
+		widget = QWidget(self)
+		layout = QVBoxLayout(self)
+		# select language
+		select_layout = QHBoxLayout(self)
+		select_language = QLabel(u"Sélection du langage")
+		select_layout.addWidget(select_language)
+		self.language = QComboBox(self)
+		self.save_snippets = QPushButton(u"Enregistrer", self)
+		self.save_snippets.clicked.connect(self.saveSnippets)
+		select_layout.addWidget(self.language)
+		select_layout.addStretch(1)
+		select_layout.addWidget(self.save_snippets)
+		self.snippetsTable = SnippetsTable()
+		self.language.currentIndexChanged[str].connect(self.lang_changed)
+		self.lexers = load_lexer.load(["dev-theme/dev_lexers", "custom_lexers"])[0]
+		for name in self.lexers:
+			self.language.addItem(name)
+		layout.addLayout(select_layout)
+		layout.addWidget(self.snippetsTable)
+		widget.setLayout(layout)
+		i = self.tab.addTab(widget, u"Snippets")
+		self.tab.tabBar().setTabTextColor(i, QColor("#FFFFFF"))
 		self.vlayout.addWidget(self.tab)
+	
+	def saveSnippets(self):
+		settings = QSettings("lheido", "lheidoEdit")
+		#clear snippets
+		settings.remove("snippets/{0}".format(self.language.currentText()))
+		#set snippets settings
+		for key, val in self.snippetsTable.getKeysValues().items():
+			settings.setValue(key, val)
 	
 	def accept(self):
 		settings = QSettings("lheido", "lheidoEdit")
@@ -346,6 +421,9 @@ class SettingsDialog(QDialog):
 		font, ok = QFontDialog.getFont()
 		if ok:
 			self.editor_font = font
+	
+	def lang_changed(self, name):
+		self.snippetsTable.fillTable(name)
 	
 	def get_settings(self):
 		print "settings saved"

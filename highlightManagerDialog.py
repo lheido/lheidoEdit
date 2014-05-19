@@ -57,7 +57,7 @@ class HighlightManagerDialog(QDialog):
 		Vlayout = QVBoxLayout(self)
 		# select language
 		select_layout = QHBoxLayout(self)
-		select_language = QLabel(u"Selection du langage")
+		select_language = QLabel(u"Sélection du langage")
 		select_layout.addWidget(select_language)
 		self.language = QComboBox(self)
 		select_layout.addWidget(self.language)

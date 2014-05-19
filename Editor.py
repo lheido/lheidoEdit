@@ -205,7 +205,16 @@ class Editor(QsciScintilla):
 			line, index = self.getCursorPosition()
 			word = self.wordAtLeft(line, index)
 			if word:
-				self.setSelection(line, index - len(word), line, index)
+				settings = QSettings("lheido", "lheidoEdit")
+				indent = "".join(["\t" for i in xrange(self.indentation(line) / self.tabWidth())])
+				snippet = settings.value("snippets/{0}/{1}".format(self.lang, word), "").toString()
+				snippet = str(snippet).decode("unicode_escape")
+				snippet = snippet.replace("\n", "\n{0}".format(indent))
+				if not snippet == "":
+					self.setSelection(line, index - len(word), line, index)
+					self.replaceSelectedText(snippet)
+				else:
+					super(Editor, self).keyPressEvent(event)
 			else:
 				super(Editor, self).keyPressEvent(event)
 		else:
