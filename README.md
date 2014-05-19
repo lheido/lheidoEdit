@@ -14,8 +14,8 @@ Basic features :
  - code folding.
  - syntax highlighting manager. (/!\\ save keywords before use it).
  - execute file in a terminal.
+ - snippets.
 
 --------------------------------------------------------------------------------
 Other features (coming soon) :
 
- - snippets.
